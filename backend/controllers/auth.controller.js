@@ -4,30 +4,30 @@ import { redis } from "../lib/redis.js";
 
 const generateTokens = (userId) => {
   const accessToken = jwt.sign({ userId }, process.env.ACCESSTOKEN_SECRET, {
-    expiresIn: "1m",
+    expiresIn: "5m",
   });
   const refreshToken = jwt.sign({ userId }, process.env.REFRESHTOKEN_SECRET, {
-    expiresIn: "5m",
+    expiresIn: "10m",
   });
 
   return { accessToken, refreshToken };
 };
 
 const saveRefreshToken = async (userId, refreshToken) => {
-  await redis.set(`refreshToken:${userId}`, refreshToken, "EX", 5 * 60);
+  await redis.set(`refresh_Token:${userId}`, refreshToken, "EX", 10 * 60);
 };
 
-const setCookies = async (res, accesssToken, refreshToken) => {
-  res.cookie("accessToken", accesssToken, {
+const setCookies = async (res, accessToken, refreshToken) => {
+  res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    maxAge: 60 * 1000,
+    maxAge: 5 * 60 * 1000,
     sameSite: "strict",
     secure: process.env.NODE_ENV === "production",
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    maxAge: 5 * 60 * 1000,
+    maxAge: 10 * 60 * 1000,
     sameSite: true,
     secure: process.env.NODE_ENV === "production",
   });
@@ -72,18 +72,17 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ message: "Email and password require to login" });
+    if (!email || !password)
+      return res
+        .status(400)
+        .json({ message: "Email and password require to login" });
 
     const user = await userModel.findOne({ email });
-    console.log(`1user done`);
-    if (user && await user.comparePassword(password)) {
-      console.log(`email found and pass matched`);
-      const { accessToken, refreshToken } = generateTokens(user._id);
-      console.log(accessToken, refreshToken);
 
-      console.log(`saving to redis`);
+    if (user && (await user.comparePassword(password))) {
+      const { accessToken, refreshToken } = generateTokens(user._id);
+
       await saveRefreshToken(user._id, refreshToken);
-      console.log(`setting up cookie`);
 
       setCookies(res, accessToken, refreshToken);
 
@@ -94,7 +93,7 @@ export const login = async (req, res) => {
           email: user.email,
           role: user.role,
         },
-        message: "user created successfully",
+        message: "user logged in successfully",
       });
     }
   } catch (error) {
@@ -115,7 +114,41 @@ export const logout = async (req, res) => {
     res.clearCookie("refreshToken");
     res.status(200).json({ message: "logout success" });
   } catch (error) {
-    res.status(500).json({message: `Internal server error`, error: error.message});
+    res
+      .status(500)
+      .json({ message: `Internal server error`, error: error.message });
   }
-
 };
+
+export const refreshAccessToken = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken)
+      return res.status(400).json({ message: "no refresh token found" });
+
+    const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
+    const storedToken = await redis.get(`refresh_Token:${decoded.userId}`);
+
+    if (storedToken !== refreshToken)
+      return res.status(400).json({ message: "refresh token compromised" });
+    const accessToken = jwt.sign(
+      { userId: decoded.userId },
+      process.env.ACCESSTOKEN_SECRET,
+      { expiresIn: "5m" }
+    );
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      maxAge: 5 * 60 * 1000,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    });
+    res.json({ message: "access token refresh successfully" });
+  } catch (error) {
+    console.log(`error refreshing accesstoken`);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// TODO: implement later
+// export const getProfile = async (req, res) => {}

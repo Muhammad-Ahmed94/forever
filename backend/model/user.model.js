@@ -56,8 +56,8 @@ userSchema.pre("save", async function (next) {
 
 // check pwd before logging in
 userSchema.methods.comparePassword = async function (password) {
-    return await bcrypt.compare(password, this.password);
-}
+  return await bcrypt.compare(password, this.password);
+};
 
 const userModel = mongoose.model("User", userSchema);
 export default userModel;
