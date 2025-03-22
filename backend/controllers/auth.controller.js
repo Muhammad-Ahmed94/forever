@@ -14,9 +14,7 @@ const generateTokens = (userId) => {
 };
 
 const saveRefreshToken = async (userId, refreshToken) => {
-  console.log("Saving to Redis...");
   await redis.set(`refreshToken:${userId}`, refreshToken, "EX", 5 * 60);
-  console.log(`saved to redis`);
 };
 
 const setCookies = async (res, accesssToken, refreshToken) => {
@@ -27,15 +25,12 @@ const setCookies = async (res, accesssToken, refreshToken) => {
     secure: process.env.NODE_ENV === "production",
   });
 
-  console.log(`res cookie sent`);
-
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     maxAge: 5 * 60 * 1000,
     sameSite: true,
     secure: process.env.NODE_ENV === "production",
   });
-  console.log(`refresh cookie sent`);
 };
 
 export const signup = async (req, res) => {
@@ -52,7 +47,6 @@ export const signup = async (req, res) => {
 
     // Auth
     const { accessToken, refreshToken } = generateTokens(user._id);
-    console.log(`accessTKN: ${accessToken}\nrefreshTKN: ${refreshToken}`);
 
     // save refresh token to redis
     await saveRefreshToken(user._id, refreshToken);
@@ -76,9 +70,52 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  res.send("login route");
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ message: "Email and password require to login" });
+
+    const user = await userModel.findOne({ email });
+    console.log(`1user done`);
+    if (user && await user.comparePassword(password)) {
+      console.log(`email found and pass matched`);
+      const { accessToken, refreshToken } = generateTokens(user._id);
+      console.log(accessToken, refreshToken);
+
+      console.log(`saving to redis`);
+      await saveRefreshToken(user._id, refreshToken);
+      console.log(`setting up cookie`);
+
+      setCookies(res, accessToken, refreshToken);
+
+      res.status(200).json({
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+        message: "user created successfully",
+      });
+    }
+  } catch (error) {
+    console.error(`invalid username or password`);
+    res.status(500).json({ message: error.message });
+  }
 };
 
 export const logout = async (req, res) => {
-  res.send("logout route");
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (refreshToken) {
+      const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
+      await redis.del(`Refresh_token:${decoded.userId}`);
+    }
+
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(200).json({ message: "logout success" });
+  } catch (error) {
+    res.status(500).json({message: `Internal server error`, error: error.message});
+  }
+
 };
