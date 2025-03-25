@@ -117,10 +117,22 @@ export const recommendedProducts = async (req, res) => {
         }}
       ]
     );
-
+    console.log(`products: ${products}`);
     return res.json(products);
   } catch (error) {
     console.error(`Could not load recommended products`);
     res.status(500).json({ message: "Could not load recommended products" });
   }
-}
+};
+
+export const getProductsByCategory = async (req, res) => {
+  const { category } = req.params;
+
+  try {
+    const products = await productModel.find({ category });
+    res.json(products);
+  } catch (error) {
+    console.error(`Error getting products by category`, error.message);
+    res.status(500).json({ message: `server error `, error: error.message })
+  }
+};
