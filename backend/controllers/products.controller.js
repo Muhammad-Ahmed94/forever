@@ -21,17 +21,20 @@ export const featuredProduct = async (req, res) => {
     - write it in redis under the key of "featured_product"
     */
     const product = await redis.get("featured_product");
+    console.log(`product: ${product}`);
     if (product) {
       return res.json(JSON.parse(product));
-    } else {
-      const featuredProduct = await productModel.find({ isFeatured: true }).lean();
-      if (!featuredProduct.length) {
-        return res.status(400).json({ message: "No featured product found" });
-      } else {
-        await redis.set("featured_product", JSON.stringify(featuredProduct));
-      }
-      return res.json(featuredProduct);
     }
+
+    const featuredProduct = await productModel.find({ isFeatured: true }).lean();
+    console.log(`featured Product: ${featuredProduct}`);
+    if(!featuredProduct.length) {
+      return res.status(400).json({ message: "No featured product found" });
+    }
+    
+    await redis.set('featured_product', JSON.stringify(featuredProduct));
+
+    return res.json(featuredProduct);
   } catch (error) {
     console.log(`error getting featured products`);
     res.status(400).json({ message: "Error fetching products" });
