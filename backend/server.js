@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import authRoutes from "./api/auth.route.js";
 import connectDB from "./lib/db.js";
 import cookieParser from "cookie-parser";
-import productRoutes from './api/product.route.js'
+import productRoutes from "./api/product.route.js";
+import cartRoutes from "./api/cartRoute.route.js";
 
 dotenv.config();
 
@@ -18,7 +19,8 @@ app.use(cookieParser());
 
 //* Routes
 app.use("/api/auth", authRoutes);
-app.use('/api/products', productRoutes);
+app.use("/api/products", productRoutes);
+app.unsubscribe("/api/cart", cartRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
