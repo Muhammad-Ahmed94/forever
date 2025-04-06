@@ -1,5 +1,6 @@
 import { stripe } from "../lib/stripe";
-import couponModel from "../model/coupon.model";
+import couponModel from "../model/coupon.model.js";
+import orderModel from "../model/order.model.js";
 
 export const createCheckoutSession = async (req, res) => {
   try {
@@ -69,6 +70,13 @@ export const createCheckoutSession = async (req, res) => {
       metadata: {
         userId: req.user._id.toString(),
         couponCode: couponCode || "",
+        products: JSON.stringify(
+          products.map((p) => ({
+            id: p._id,
+            quantity: p.quantity,
+            price: p.price,
+          }))
+        ),
       },
     });
 
@@ -84,21 +92,53 @@ export const createCheckoutSession = async (req, res) => {
 };
 
 export const checkoutSuccess = async (req, res) => {
+  try {
     const { sessionId } = req.body;
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    if(session.payment_status === "paid") {
-
-        if(session.metadata.couponCode) {
-            await couponModel.findOneAndUpdate({
-                code: session.metadata.couponCode,
-                userId: session.metadata.userId
-            }, {
-                isActive: false
-            })
-        }
+    if(session.payment_status !== "paid") {
+      res.status(400).json({ message: "Payment not completed yet. Please proceed to pay first." })
     }
-}
+
+    if (session.payment_status === "paid") {
+      if (session.metadata.couponCode) {
+        await couponModel.findOneAndUpdate(
+          {
+            code: session.metadata.couponCode,
+            userId: session.metadata.userId,
+          },
+          {
+            isActive: false,
+          }
+        );
+      }
+
+      const products = JSON.parse(session.metadata.products);
+      const newOrder = new orderModel({
+        user: session.metadata.userId,
+        products: products.map((p) => ({
+          product: p.id,
+          quantity: p.quantity,
+          price: p.price,
+        })),
+        totalAmount: session.amount_total / 100,
+        stripeSessionId: sessionId,
+      });
+
+      await newOrder.save();
+
+      res.status(200).json({
+        success: true,
+        message:
+          "Payment successful, order created and coupon deactivated if used",
+        orderId: newOrder._id,
+      });
+    }
+  } catch (error) {
+    console.error("Error processing successful checkout", error.message);
+    res.status(500).json({ message: "Error processing successful checkout" });
+  }
+};
 
 async function createStripeCoupon(discount) {
   try {
@@ -109,6 +149,7 @@ async function createStripeCoupon(discount) {
     return coupon.id;
   } catch (error) {
     console.error("Stripe coupon creation failed", error.message);
+    return res.status(500).json({ message: "Stripe coupon creation failed." });
   }
 }
 
