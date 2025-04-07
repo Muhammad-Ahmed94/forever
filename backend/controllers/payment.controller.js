@@ -1,4 +1,4 @@
-import { stripe } from "../lib/stripe";
+import { stripe } from "../lib/stripe.js";
 import couponModel from "../model/coupon.model.js";
 import orderModel from "../model/order.model.js";
 
