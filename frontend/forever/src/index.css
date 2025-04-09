@@ -1,1 +1,24 @@
 @import "tailwindcss";
+@layer components;
+
+@theme {
+    --color-bg-primary: #f0f0f0;
+    --color-logo-dot: #c586a5;
+    --color-font-main: #2a2a2a;
+    --color-border: #b2b2b2;
+    --color-hero-font: #414141;
+    --color-auth-color: #b2b2b2;
+
+    --color-latest-col-color: #707070;
+
+}
+
+@layer components {
+    .nav-link {
+        @apply pb-2 hover:cursor-pointer hover:underline transition duration-200;
+    }
+
+    .auth-btn {
+        @apply bg-auth-color px-4 py-2 text-center rounded font-medium;
+    }
+}
