@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 type NavbarProps = {};
 
 const Navbar = (props: NavbarProps) => {
-  const [isUser, setIsUser] = useState(true);
+  const [isUser, setIsUser] = useState(false);
 
   return (
     <header className="w-full shadow-sm">
@@ -62,8 +62,8 @@ const Navbar = (props: NavbarProps) => {
           </button>
 
           {!isUser ? (
-            <Link to="/login" className="auth-btn">
-              Login
+            <Link to="/signup" className="auth-btn">
+              signup
             </Link>
           ) : (
             <Link to="/" className="auth-btn">
