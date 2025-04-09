@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 type NavbarProps = {};
 
 const Navbar = (props: NavbarProps) => {
-  const [isUser, setIsUser] = useState(false);
+  const [isUser, setIsUser] = useState(true);
 
   return (
     <header className="w-full shadow-sm">
