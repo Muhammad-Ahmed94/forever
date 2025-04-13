@@ -4,9 +4,8 @@ import SignUpPage from "./pages/SignUpPage"
 import LoginPage from "./pages/LoginPage"
 import Navbar from "./components/Navbar"
 
-type Props = {}
 
-const App = (props: Props) => {
+const App = () => {
   return (
     <div className="min-h-screen bg-bg-primary relative text-font-main overflow-hidden">
       <div className="relative z-50 p-12">

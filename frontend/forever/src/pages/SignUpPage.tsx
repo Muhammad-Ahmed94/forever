@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import Button from "../components/Button";
 import Formfield from "../components/Formfield";
 
-type SignUpPageProps = {};
 
-const SignUpPage = (props: SignUpPageProps) => {
+const SignUpPage = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
