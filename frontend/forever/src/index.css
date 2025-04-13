@@ -21,4 +21,8 @@
     .auth-btn {
         @apply bg-auth-color px-4 py-2 text-center rounded font-medium;
     }
+
+    .align-center {
+        @apply justify-center items-center;
+    }
 }

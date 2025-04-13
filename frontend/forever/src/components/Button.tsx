@@ -7,8 +7,8 @@ type ButtonProps = {
 
 const Button: React.FC<ButtonProps> = ({ name, styles }) => {
   return (
-    <div className={['py-2 px-4', styles]}>
-        {name}
+    <div className={`border border-gray-300 px-4 pt-2 items-center cursor-pointer ${styles || ''}`}>
+        <button>{name}</button>
     </div>
   )
 }
