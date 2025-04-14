@@ -25,4 +25,8 @@
     .align-center {
         @apply justify-center items-center;
     }
+
+    .border-red {
+        @apply border border-red-500;
+    }
 }

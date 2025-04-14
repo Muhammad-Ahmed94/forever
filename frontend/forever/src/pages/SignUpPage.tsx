@@ -15,23 +15,15 @@ const SignUpPage = () => {
     console.log(formData);
   };
 
-/*   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
- */
   return (
-    <div className="capitalize font-light shadow-2xl relative text-center py-8 flex flex-col items-center">
-      <h2>create an account</h2>
-      <div className="w-1/2 border border-gray-300 flex flex-col align-center rounded py-4">
-        enter details below
-        <div className="flex flex-col justify-start items-start mx-4">
+    <div className="shadow-2xl text-2xl relative text-center py-8 flex flex-col items-center">
+      <h2 className="font-semibold">Create account</h2>
+      <div className="w-full border border-gray-300 flex flex-col align-center rounded py-4">
+        Enter details below
+        <div className="flex flex-col justify-start items-start mx-4 text-xl">
           <form
             onSubmit={handleFormSubmit}
-            className="w-full px-6 flex flex-col items-center"
+            className="w-full px-6 flex flex-col items-center text-lg capitalize"
           >
             <Formfield
               type="text"
@@ -56,7 +48,7 @@ const SignUpPage = () => {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value})}
             />
-        <div className="">
+        <div className="cursor-pointer">
           <Button name="Create" styles="bg-blue-600 text-white font-semibold rounded " />
         </div>
           </form>
