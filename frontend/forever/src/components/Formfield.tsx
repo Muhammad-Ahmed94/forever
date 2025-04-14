@@ -18,6 +18,7 @@ const Formfield: React.FC<FormfeildProps> = ({title, placeholder, type, value, o
           value={value}
           onChange={onChange}
           className="border border-gray-400 rounded px-2 py-2"
+          required
         />
     </div>
   );

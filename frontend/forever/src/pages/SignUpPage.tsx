@@ -17,14 +17,14 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="w-full shadow-2xl text-2xl relative text-center py-8 flex flex-col items-center">
+    <div className="w-full h-screen shadow-2xl text-2xl relative text-center py-8 flex flex-col align-center">
       <h2 className="font-semibold">Create account</h2>
       <div className="border border-gray-300 flex flex-col align-center rounded py-4 w-full">
         Enter details below
-        <div className="flex flex-col justify-start items-start mx-4 text-xl w-full">
+        <div className="flex flex-col align-center mx-4 text-xl w-full">
           <form
             onSubmit={handleFormSubmit}
-            className="w-full px-6 flex flex-col items-center text-lg capitalize"
+            className="px-6 py-4 flex flex-col items-center text-lg capitalize shadow-xl"
           >
             <Formfield
               type="text"
@@ -49,7 +49,7 @@ const SignUpPage = () => {
             <Formfield
               type="password"
               title="Password"
-              placeholder="*******"
+              placeholder="**********"
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
@@ -62,9 +62,12 @@ const SignUpPage = () => {
           <div className="text-[#b2b2b2] w-full">
             <p className="flex align-center">
               Already have an account?
-              <Link to="/login" className="text-[#232323] underline flex align-center">
+              <Link
+                to="/login"
+                className="text-[#232323] underline flex align-center"
+              >
                 Login here
-              <ArrowRight />
+                <ArrowRight />
               </Link>
             </p>
           </div>
