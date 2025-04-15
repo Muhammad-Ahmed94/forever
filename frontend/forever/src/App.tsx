@@ -5,11 +5,16 @@ import LoginPage from "./pages/LoginPage"
 import Navbar from "./components/Navbar"
 import { Toaster } from "react-hot-toast"
 import useUserStore from "./stores/useUserStore"
+import { useEffect } from "react"
 
 
 const App = () => {
-  const {user} = useUserStore();
-  
+  const {user, checkAuth} = useUserStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth])
+
   return (
     <div className="min-h-screen bg-bg-primary relative text-font-main overflow-hidden">
       <div className="relative z-50 p-12">
@@ -17,7 +22,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={!user ? <SignUpPage /> : <Navigate to="/" />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" />} />
         </Routes>
         <Toaster />
       </div>

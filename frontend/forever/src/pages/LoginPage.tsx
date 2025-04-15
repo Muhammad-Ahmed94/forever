@@ -3,13 +3,17 @@ import Button from "../components/Button";
 import Formfield from "../components/Formfield";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import useUserStore from "../stores/useUserStore";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const { login } = useUserStore() as { login: (email: string, password: string) => void };
+
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    login(email, password);
     console.log(`email:${email} \n password:${password}`);
   };
 
