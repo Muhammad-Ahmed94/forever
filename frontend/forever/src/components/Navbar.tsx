@@ -2,9 +2,7 @@ import { useState } from "react";
 import { ShoppingCart, User, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 
-type NavbarProps = {};
-
-const Navbar = (props: NavbarProps) => {
+const Navbar = () => {
   const [isUser, setIsUser] = useState(false);
 
   return (

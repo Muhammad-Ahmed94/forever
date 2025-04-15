@@ -17,7 +17,7 @@ const saveRefreshToken = async (userId, refreshToken) => {
   await redis.set(`refresh_Token:${userId}`, refreshToken, "EX", 10 * 60);
 };
 
-const setCookies = async (res, accessToken, refreshToken) => {
+const setCookies = (res, accessToken, refreshToken) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     maxAge: 5 * 60 * 1000,
@@ -35,13 +35,12 @@ const setCookies = async (res, accessToken, refreshToken) => {
 
 export const signup = async (req, res) => {
   const { name, email, password } = req.body;
-  if (!email)
-    return res.status(400).json({ message: "Enter details to signup" });
 
   try {
     const userFound = await userModel.findOne({ email });
-    if (userFound)
+    if (userFound) {
       return res.status(400).json({ message: "user already exists" }); // check if user exist
+    }
 
     const user = await userModel.create({ name, email, password }); // create user, when no user found
 
@@ -52,7 +51,7 @@ export const signup = async (req, res) => {
     await saveRefreshToken(user._id, refreshToken);
 
     // create token-cookies
-    await setCookies(res, accessToken, refreshToken);
+    setCookies(res, accessToken, refreshToken);
 
     res.status(201).json({
       user: {

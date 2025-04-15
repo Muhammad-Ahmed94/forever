@@ -3,17 +3,28 @@ import Button from "../components/Button";
 import Formfield from "../components/Formfield";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import useUserStore from "../stores/useUserStore";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
+
+  const {signup} = useUserStore();
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    signup(
+      formData.name,
+      formData.email,
+      formData.password,
+      formData.confirmPassword
+    );
+
+    console.log("signup complete");
   };
 
   return (
@@ -53,6 +64,16 @@ const SignUpPage = () => {
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
+              }
+            />
+
+            <Formfield
+              type="password"
+              title="Confirm pasword"
+              placeholder="**********"
+              value={formData.confirmPassword}
+              onChange={(e) =>
+                setFormData({ ...formData, confirmPassword: e.target.value })
               }
             />
             <div className="cursor-pointer">

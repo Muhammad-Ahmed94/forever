@@ -1,20 +1,25 @@
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import HomePage from "./pages/HomePage"
 import SignUpPage from "./pages/SignUpPage"
 import LoginPage from "./pages/LoginPage"
 import Navbar from "./components/Navbar"
+import { Toaster } from "react-hot-toast"
+import useUserStore from "./stores/useUserStore"
 
 
 const App = () => {
+  const {user} = useUserStore();
+  
   return (
     <div className="min-h-screen bg-bg-primary relative text-font-main overflow-hidden">
       <div className="relative z-50 p-12">
         <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/signup" element={!user ? <SignUpPage /> : <Navigate to="/" />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
+        <Toaster />
       </div>
     </div>
   );
