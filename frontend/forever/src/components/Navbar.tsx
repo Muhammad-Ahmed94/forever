@@ -1,9 +1,13 @@
-import { useState } from "react";
 import { ShoppingCart, User, Search } from "lucide-react";
 import { Link } from "react-router-dom";
+import useUserStore from "../stores/useUserStore";
 
 const Navbar = () => {
-  const [isUser, setIsUser] = useState(false);
+  const { user, logout } = useUserStore();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <header className="w-full shadow-sm">
@@ -59,14 +63,12 @@ const Navbar = () => {
             <ShoppingCart />
           </button>
 
-          {!isUser ? (
+          {!user ? (
             <Link to="/signup" className="auth-btn">
               signup
             </Link>
           ) : (
-            <Link to="/" className="auth-btn">
-              Logout
-            </Link>
+            <Link to="/login" className="auth-btn" onClick={handleLogout}>Logout</Link>
           )}
         </div>
       </nav>

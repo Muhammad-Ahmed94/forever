@@ -9,6 +9,7 @@ interface userStoreInterface {
   checkingAuth: boolean;
   signup: (name: string, email: string, password: string, confirmPassword: string) => void;
   login: (email: string, password: string) => void;
+  logout: () => void;
   checkAuth: () => void;
 }
 
@@ -61,8 +62,21 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
     }
   },
 
+  logout: async () => {
+    try {
+      await axiosInst.post("/auth/logout");
+      set({ user: null });
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.message) {
+        return toast.error(
+          error.response?.data?.message || "An error occured while logging out"
+        );
+      }
+    }
+  },
+
   checkAuth: async () => {
-    set({checkingAuth: true});
+    set({ checkingAuth: true });
 
     try {
       const res = await axiosInst.get("/auth/profile");
@@ -70,6 +84,6 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
     } catch (error) {
       set({ checkingAuth: false, user: null });
     }
-  }
+  },
 }));
 export default useUserStore;
