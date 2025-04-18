@@ -2,16 +2,17 @@ import React from "react";
 
 type FormfeildProps = {
   title: string;
-  placeholder: string;
+  placeholder?: string;
   type: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-const Formfield: React.FC<FormfeildProps> = ({title, placeholder, type, value, onChange}) => {
+const Formfield: React.FC<FormfeildProps> = ({title, placeholder, type, value, className, onChange}) => {
   return (
-    <div className="my-2 flex flex-col items-start">
-      <h3 className="mb-1">{title}</h3>
+    <div className={`my-2 flex flex-col items-start ${className}`}>
+      <label className="mb-1">{title}</label>
         <input
           type={type}
           placeholder={placeholder}
