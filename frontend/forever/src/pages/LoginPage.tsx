@@ -9,12 +9,12 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { login } = useUserStore() as { login: (email: string, password: string) => void };
+  const { login, user } = useUserStore();
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     login(email, password);
-    console.log(`email:${email} \n password:${password}`);
+    console.log(`email:${email} \n password:${password}\n${user}`);
   };
 
   return (

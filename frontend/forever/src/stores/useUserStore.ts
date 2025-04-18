@@ -31,7 +31,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
         email,
         password,
       });
-      set({ user: res.data, loading: false });
+      set({ user: res.data.user, loading: false });
       console.log(res.data);
     } catch (error) {
       set({ loading: false });
@@ -49,8 +49,8 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
 
     try {
       const res = await axiosInst.post("/auth/login", { email, password });
-      console.log(`Loggin in and: ${res.data.user}`);
-      set({ user: res.data, loading: false });
+      console.log("Loggin in and:", res.data);
+      set({ user: res.data.user, loading: false });
     } catch (error) {
       if (axios.isAxiosError(error) && error.message) {
         return toast.error(
@@ -80,7 +80,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
 
     try {
       const res = await axiosInst.get("/auth/profile");
-      set({ user: res.data, checkingAuth: false });
+      set({ user: res.data.user, checkingAuth: false });
     } catch (error) {
       set({ checkingAuth: false, user: null });
     }

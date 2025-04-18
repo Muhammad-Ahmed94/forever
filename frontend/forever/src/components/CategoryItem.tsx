@@ -8,11 +8,12 @@ interface CategoryProps {
   };
 }
 
+
 const CategoryItem: React.FC<CategoryProps> = ({ category }) => {
   return (
     <Link
-      to={category.href}
-      className="relative rounded-xl overflow-hidden h-64 group"
+      to={"/category" + category.href}
+      className="relative rounded-xl overflow-hidden h-64 group shadow-2xl"
     >
       {/* Background Image */}
       <img

@@ -1,9 +1,10 @@
-import { ShoppingCart, User, Search } from "lucide-react";
+import { ShoppingCart, User, Search, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import useUserStore from "../stores/useUserStore";
 
 const Navbar = () => {
   const { user, logout } = useUserStore();
+  const isAdmin = user?.role === "admin";
 
   const handleLogout = () => {
     logout();
@@ -63,12 +64,24 @@ const Navbar = () => {
             <ShoppingCart />
           </button>
 
+          {isAdmin && (
+            <Link
+              className="auth-btn font-medium transition duration-300 ease-in-out"
+              to={"/admin-dashboard"}
+            >
+              <Lock className="inline-block mr-1" size={18} />
+              <span className="hidden sm:inline">Dashboard</span>
+            </Link>
+          )}
+
           {!user ? (
             <Link to="/signup" className="auth-btn">
               signup
             </Link>
           ) : (
-            <Link to="/login" className="auth-btn" onClick={handleLogout}>Logout</Link>
+            <Link to="/login" className="auth-btn" onClick={handleLogout}>
+              Logout
+            </Link>
           )}
         </div>
       </nav>

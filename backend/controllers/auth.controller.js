@@ -94,6 +94,7 @@ export const login = async (req, res) => {
         },
         message: "user logged in successfully",
       });
+      console.log("user role is:", user);
     }
   } catch (error) {
     console.error(`invalid username or password`);

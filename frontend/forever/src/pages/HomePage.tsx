@@ -7,9 +7,8 @@ const category = [
   { href: "/suits", name: "Suits", imageUrl: "/suits.jpg" },
   { href: "/glasses", name: "Glasses", imageUrl: "/glasses.jpg" },
   { href: "/jackets", name: "Jackets", imageUrl: "/jackets.jpg" },
+  { href: "/bags", name: "Bags", imageUrl: "/bags.jpg" },
 ];
-
-
 const HomePage = () => {
   return (
     <div className="relative min-h-screen text-black overflow-hidden">
