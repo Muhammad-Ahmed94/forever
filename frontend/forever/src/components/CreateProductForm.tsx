@@ -1,6 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Formfield from "./Formfield";
 import { Plus } from "lucide-react";
+import { useProductStore } from "../stores/useProductStore";
 
 const CreateProductForm = () => {
   const [newProduct, setNewProduct] = useState({
@@ -21,29 +22,55 @@ const CreateProductForm = () => {
     "bags",
   ];
 
-  const loading = false;
+  const { createProduct, loading } = useProductStore();
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (
+      !newProduct.name ||
+      !newProduct.price ||
+      !newProduct.category ||
+      !newProduct.image
+    ) {
+      return alert("Please fill all required fields.");
+    }
+
     console.log(newProduct);
+    try {
+      await createProduct(newProduct);
+      setNewProduct({
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        image: "",
+      });
+    } catch (error: any) {
+      console.log("Product creation failed", error.message);
+    }
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if(file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setNewProduct({...newProduct, image: reader.result as string || ""});
-        }
-        reader.readAsDataURL(file); //base 64-url
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewProduct({
+          ...newProduct,
+          image: (reader.result as string) || "",
+        });
+      };
+      reader.readAsDataURL(file); //base 64-url
     }
-  }
+  };
   return (
     <div className="min-w-1/2 relative border border-border rounded px-4 py-6 ">
       <h2 className="mb-4 text-font-main font-semibold text-2xl text-center">
         Add new product
       </h2>
       <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
+        {/* PRODUCT NAME */}
         <Formfield
           type="text"
           title="Name"
@@ -54,6 +81,7 @@ const CreateProductForm = () => {
           }
         />
         <div className="flex flex-col">
+          {/* DESCRIPTION */}
           <label htmlFor="description">Description</label>
           <textarea
             name="description"
@@ -66,6 +94,7 @@ const CreateProductForm = () => {
             }
           />
         </div>
+        {/* PRICE */}
         <Formfield
           type="number"
           title="Price"
@@ -74,6 +103,7 @@ const CreateProductForm = () => {
             setNewProduct({ ...newProduct, price: e.target.value })
           }
         />
+        {/* CATEGORY */}
         <label htmlFor="category">Category</label>
         <select
           name="category"
@@ -92,12 +122,21 @@ const CreateProductForm = () => {
           ))}
         </select>
 
-        <Formfield
-          type="file"
-          title="Upload product image"
-          value={newProduct.image}
-          onChange={handleImageChange}
-        />
+        {/* IMAGE */}
+        {!newProduct.image ? (
+          <Formfield
+            type="file"
+            title="Upload product image"
+            accept="image/*"
+            onChange={handleImageChange}
+          />
+        ) : (
+          <img
+            src={newProduct.image}
+            alt="Preview"
+            className="w-32 h-32 object-cover rounded border mt-2"
+          />
+        )}
         <button
           type="submit"
           className="flex align-center gap-2 auth-btn cursor-pointer"

@@ -32,6 +32,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
         password,
       });
       set({ user: res.data.user, loading: false });
+      toast.success("Account created successfully")
       console.log(res.data);
     } catch (error) {
       set({ loading: false });
@@ -51,6 +52,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       const res = await axiosInst.post("/auth/login", { email, password });
       console.log("Loggin in and:", res.data);
       set({ user: res.data.user, loading: false });
+      toast.success("User logged in successfully");
     } catch (error) {
       if (axios.isAxiosError(error) && error.message) {
         return toast.error(
@@ -66,6 +68,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
     try {
       await axiosInst.post("/auth/logout");
       set({ user: null });
+      toast.success("Logout successfully");
     } catch (error) {
       if (axios.isAxiosError(error) && error.message) {
         return toast.error(
