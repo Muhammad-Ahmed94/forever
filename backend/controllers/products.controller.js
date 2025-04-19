@@ -77,7 +77,7 @@ export const createProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const productById = await productModel.findById(req.params.id);
-    console.log(`product found: ${product}`);
+    console.log(`product found: ${productById}`);
 
     if (!productById) {
       return res.status(400).json({ message: "Product not found" });
