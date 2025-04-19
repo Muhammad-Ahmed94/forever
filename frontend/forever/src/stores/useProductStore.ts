@@ -19,6 +19,7 @@ interface productStoreInterface {
   setProducts: (products: Product[]) => void;
   createProduct: (productData: Product) => Promise<void>;
   getAllProducts: () => void;
+  activeFeatureProduct: (productId: string) => void;
   deleteProduct: (productId: string) => void;
 }
 
@@ -70,7 +71,36 @@ export const useProductStore = create<productStoreInterface>((set, get) => ({
     }
   },
 
-  
+  activeFeatureProduct: async (productId) => {
+    console.log("before loading false");
+
+    set({ loading: true });
+    try {
+      console.log("before res");
+      const res = await axiosInst.patch(`/products/${productId}`);
+      console.log("after res");
+
+      set((prevState) => ({
+        products: prevState.products.map((product) =>
+          product._id === productId
+            ? { ...product, isFeatured: res.data.isFeatured }
+            : product
+        ),
+        loading: false,
+      }));
+      toast.success("Product is now featured");
+    } catch (error) {
+      set({ loading: false });
+      if (axios.isAxiosError(error) && error.response) {
+        return toast.error(
+          error.response?.data.message ||
+            "Error occured while getting products from DB"
+        );
+      } else {
+        toast.error("Failed to load products.");
+      }
+    }
+  },
 
   deleteProduct: async (productId) => {
     console.log("before loading false");

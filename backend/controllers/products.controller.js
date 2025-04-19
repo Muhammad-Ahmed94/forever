@@ -142,7 +142,7 @@ export const toggleFeaturedProduct = async (req, res) => {
     const product = await productModel.findById(req.params.id);
     if(product) {
       product.isFeatured = !product.isFeatured;
-      const updatedProduct = await redis.save();
+      const updatedProduct = await product.save();
       await updateFeaturedProductCache();
       res.json(updatedProduct);
     } else {
