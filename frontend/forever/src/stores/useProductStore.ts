@@ -19,6 +19,7 @@ interface productStoreInterface {
   setProducts: (products: Product[]) => void;
   createProduct: (productData: Product) => Promise<void>;
   getAllProducts: () => void;
+  getProductsByCategory: (category: string) => void;
   activeFeatureProduct: (productId: string) => void;
   deleteProduct: (productId: string) => void;
 }
@@ -67,6 +68,19 @@ export const useProductStore = create<productStoreInterface>((set, get) => ({
         );
       } else {
         toast.error("Failed to load products.");
+      }
+    }
+  },
+
+  getProductsByCategory: async (category) => {
+    set({ loading: true });
+
+    try {
+      const res = await axiosInst.get(`/products/category/${category}`);
+      set({ products: res.data.products, loading: false });
+    } catch (error) {
+      if(axios.isAxiosError(error) && error.response) {
+        return toast.error(error.response.data.message || "Error fetching product by category");
       }
     }
   },

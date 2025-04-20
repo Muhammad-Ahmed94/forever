@@ -14,7 +14,7 @@ const CreateProductForm = () => {
 
   const categories = [
     "jeans",
-    "t-shirt",
+    "t-shirts",
     "shoes",
     "suits",
     "glasses",

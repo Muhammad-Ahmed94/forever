@@ -67,7 +67,7 @@ const AllProducts = () => {
                 } hover:bg-yellow-500 transition-colors duration-200`}
               >
                 <Star className="h-5 w-5" />
-                ""
+                Star
               </button>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -76,7 +76,7 @@ const AllProducts = () => {
                 className="text-red-400 hover:text-red-300"
               >
                 <Trash className="h-5 w-5" />
-                ""
+                Delete
               </button>
             </td>
           </tr>
