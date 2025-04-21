@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 
 const GetProductByCategory = () => {
-    const { getProductsByCategory, products } = useProductStore();
+    const { getProductsByCategory } = useProductStore();
     const { category } = useParams();
     useEffect(() => {
       if (category) {
@@ -12,7 +12,6 @@ const GetProductByCategory = () => {
       } else {
         console.error("Category is undefined");
       }
-      console.log("Products", products);
     }, [getProductsByCategory, category]);
   return (
     <div>GetProductByCategory</div>
