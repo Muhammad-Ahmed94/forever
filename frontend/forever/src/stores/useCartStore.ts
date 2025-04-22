@@ -3,27 +3,32 @@ import axiosInst from "../lib/axios";
 import toast from "react-hot-toast";
 import axios from "axios";
 
+interface Product {
+  _id?: string;
+  name: string;
+  description: string;
+  price: number; // Changed from string to number
+  category: string;
+  image: string;
+  isFeatured?: boolean;
+  quantity?: number; // Added quantity property
+}
+
+interface Coupon {
+  discountPercentage: number;
+}
 interface cartInterface {
-  cart: [];
-  coupon: null;
+  cart: Product[];
+  coupon: Coupon | null;
   total: number;
   subtotal: number;
 
-  getCartItems: () => {};
-//   addToCart: (product: Product) => {};
+  getCartItems: () => Promise<void>;
+  addToCart: (product: Product) => Promise<void>;
+  calculateTotals: () => void;
 }
 
-interface Product {
-  name: string;
-  description: string;
-  price: string;
-  category: string;
-  image: string;
-  _id?: string;
-  isFeatured?: boolean;
-}
-
-export const useCartStrore = create<cartInterface>((set, get) => ({
+export const useCartStore = create<cartInterface>((set, get) => ({
   cart: [],
   coupon: null,
   total: 0,
@@ -33,27 +38,59 @@ export const useCartStrore = create<cartInterface>((set, get) => ({
     try {
       const res = await axiosInst.get("/cart");
       set({ cart: res.data });
+      get().calculateTotals();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        return toast.error("Could not retrieve prodcuts from cart");
+        toast.error("Could not retrieve products from cart");
       } else {
-        toast.error(
-          "Unexpected error happend while getting prodcuts from the cart"
-        );
+        toast.error("Unexpected error occurred while getting products");
       }
     }
   },
 
-  /* addToCart: async (product) => {
+  addToCart: async (product) => {
     try {
-        await axiosInst.post("/", { productId: product._id });
-        toast.success("Product added to cart");
+      await axiosInst.post("/cart", { productId: product._id });
+      toast.success("Product added to cart");
 
-        set((prevState) => {
-            const existingItem = prevState.cart.find(item => item._id === product._id);
-        })
+      set((prevState) => {
+        const existingItem = prevState.cart.find(
+          (item) => item._id === product._id
+        );
+        const newCart = existingItem
+          ? prevState.cart.map((item) =>
+              item._id === product._id
+                ? { ...item, quantity: (item.quantity || 0) + 1 }
+                : item
+            )
+          : [...prevState.cart, { ...product, quantity: 1 }];
+
+        return { cart: newCart };
+      });
+
+      get().calculateTotals();
     } catch (error) {
-        
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error("Could not add product to cart");
+      } else {
+        toast.error("Unexpected error occurred while adding to cart");
+      }
     }
-  } */
+  },
+
+  calculateTotals: () => {
+    const { cart, coupon } = get();
+    const subtotal = cart.reduce(
+      (sum, item) => sum + item.price * (item.quantity || 1),
+      0
+    );
+    let total = subtotal;
+
+    if (coupon) {
+      const discount = subtotal * (coupon.discountPercentage / 100);
+      total = subtotal - discount;
+    }
+
+    set({ subtotal, total });
+  },
 }));
