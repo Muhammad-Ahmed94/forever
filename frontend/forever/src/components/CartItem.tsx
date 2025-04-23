@@ -1,10 +1,17 @@
 import { Minus, Plus, Trash } from "lucide-react";
 import { useCartStore } from "../stores/useCartStore";
-const CartItem = ({ item }) => {
-    const { updateQuantity, removeFromCart } = useCartStore();
-    
+import { useEffect } from "react";
+import { Product } from "../types/Product";
+
+const CartItem = ({ item }: {item: Product}) => {
+  const { updateQuantity, removeFromCart } = useCartStore();
+
+  useEffect(()=> {
+    console.log(item);
+  }, [])
+
   return (
-    <div className="rounded-lg border p-4 shadow-sm border-gray-700 bg-gray-800 md:p-6">
+    <div className="rounded-lg border p-4 shadow-sm border-gray-700 md:p-6">
       <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
         <div className="shrink-0 md:order-1">
           <img
@@ -19,20 +26,17 @@ const CartItem = ({ item }) => {
           <div className="flex items-center gap-2">
             <button
               aria-label="decrement"
-              className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border
-							 border-gray-600 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2
-							  focus:ring-emerald-500"
+              className="inline-flex h-5 w-5 shrink-0 align-center rounded-md border
+							 border-gray-600 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2"
               onClick={() => updateQuantity(item._id, item.quantity - 1)}
             >
               <Minus className="text-gray-300" />
             </button>
             <p>{item.quantity}</p>
-            aria-label="decrement"
             <button
               aria-label="increment"
-              className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border
-							 border-gray-600 bg-gray-700 hover:bg-gray-600 focus:outline-none 
-						focus:ring-2 focus:ring-emerald-500"
+              className="inline-flex h-5 w-5 shrink-0 align-center rounded-md border
+							 border-gray-600 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2"
               onClick={() => updateQuantity(item._id, item.quantity + 1)}
             >
               <Plus className="text-gray-300" />
@@ -40,21 +44,19 @@ const CartItem = ({ item }) => {
           </div>
 
           <div className="text-end md:order-4 md:w-32">
-            <p className="text-base font-bold text-emerald-400">
-              ${item.price}
-            </p>
+            <p className="font-bold text-font-main text-xl">${item.price}</p>
           </div>
         </div>
 
         <div className="w-full min-w-0 flex-1 space-y-4 md:order-2 md:max-w-md">
-          <p className="text-base font-medium text-white hover:text-emerald-400 hover:underline">
+          <p className="text-3xl font-bold capitalize text-font-main hover:underline">
             {item.name}
           </p>
-          <p className="text-sm text-gray-400">{item.description}</p>
+          <p className="text-lg text-gray-700">{item.description}</p>
 
           <div className="flex items-center gap-4">
             <button
-            aria-label="delete"
+              aria-label="delete"
               className="inline-flex items-center text-sm font-medium text-red-400
 							 hover:text-red-300 hover:underline"
               onClick={() => removeFromCart(item._id)}
@@ -66,6 +68,6 @@ const CartItem = ({ item }) => {
       </div>
     </div>
   );
-}
+};
 
-export default CartItem
+export default CartItem;

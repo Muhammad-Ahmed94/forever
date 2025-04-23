@@ -3,25 +3,18 @@ import axiosInst from "../lib/axios";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-interface Product {
-  _id?: string;
-  name: string;
-  description: string;
-  price: number; // Changed from string to number
-  category: string;
-  image: string;
-  isFeatured?: boolean;
-  quantity?: number; // Added quantity property
-}
+import { Product } from "../types/Product";
 
 interface Coupon {
   discountPercentage: number;
+  code: string;
 }
 interface cartInterface {
   cart: Product[];
   coupon: Coupon | null;
   total: number;
   subtotal: number;
+  isCouponApplied: boolean;
 
   getCartItems: () => Promise<void>;
   addToCart: (product: Product) => Promise<void>;
@@ -35,6 +28,7 @@ export const useCartStore = create<cartInterface>((set, get) => ({
   coupon: null,
   total: 0,
   subtotal: 0,
+  isCouponApplied: false,
 
   getCartItems: async () => {
     try {
@@ -81,11 +75,15 @@ export const useCartStore = create<cartInterface>((set, get) => ({
   },
 
   removeFromCart: async (productId) => {
-    await axios.delete(`/cart`, { data: { productId } });
-    set((prevState) => ({
-      cart: prevState.cart.filter((item) => item._id !== productId),
-    }));
-    get().calculateTotals();
+    try {
+      await axiosInst.delete(`/cart`, { data: { productId } });
+      set((prevState) => ({
+        cart: prevState.cart.filter((item) => item._id !== productId),
+      }));
+      get().calculateTotals();
+    } catch (error) {
+      toast.error("Could not remove product from cart");
+    }
   },
 
   calculateTotals: () => {
@@ -110,12 +108,16 @@ export const useCartStore = create<cartInterface>((set, get) => ({
       return;
     }
 
-    await axios.put(`/cart/${productId}`, { quantity });
-    set((prevState) => ({
-      cart: prevState.cart.map((item) =>
-        item._id === productId ? { ...item, quantity } : item
-      ),
-    }));
-    get().calculateTotals();
+    try {
+      await axiosInst.put(`/cart/${productId}`, { quantity });
+      set((prevState) => ({
+        cart: prevState.cart.map((item) =>
+          item._id === productId ? { ...item, quantity } : item
+        ),
+      }));
+      get().calculateTotals();
+    } catch (error) {
+      toast.error("Could not update product quantity");
+    }
   },
 }));
