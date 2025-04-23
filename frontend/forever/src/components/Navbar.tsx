@@ -61,7 +61,9 @@ const Navbar = () => {
             <User />
           </button>
           <button aria-label="Shopping cart">
-            <ShoppingCart />
+            <Link to="/cart">
+              <ShoppingCart />
+            </Link>
           </button>
 
           {isAdmin && (

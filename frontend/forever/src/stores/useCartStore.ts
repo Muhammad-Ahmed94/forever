@@ -25,7 +25,9 @@ interface cartInterface {
 
   getCartItems: () => Promise<void>;
   addToCart: (product: Product) => Promise<void>;
+  removeFromCart: (productId: string) => void;
   calculateTotals: () => void;
+  updateQuantity: (prouctId: string, quantity: number) => void;
 }
 
 export const useCartStore = create<cartInterface>((set, get) => ({
@@ -78,6 +80,14 @@ export const useCartStore = create<cartInterface>((set, get) => ({
     }
   },
 
+  removeFromCart: async (productId) => {
+    await axios.delete(`/cart`, { data: { productId } });
+    set((prevState) => ({
+      cart: prevState.cart.filter((item) => item._id !== productId),
+    }));
+    get().calculateTotals();
+  },
+
   calculateTotals: () => {
     const { cart, coupon } = get();
     const subtotal = cart.reduce(
@@ -92,5 +102,20 @@ export const useCartStore = create<cartInterface>((set, get) => ({
     }
 
     set({ subtotal, total });
+  },
+
+  updateQuantity: async (productId, quantity) => {
+    if (quantity === 0) {
+      get().removeFromCart(productId);
+      return;
+    }
+
+    await axios.put(`/cart/${productId}`, { quantity });
+    set((prevState) => ({
+      cart: prevState.cart.map((item) =>
+        item._id === productId ? { ...item, quantity } : item
+      ),
+    }));
+    get().calculateTotals();
   },
 }));
