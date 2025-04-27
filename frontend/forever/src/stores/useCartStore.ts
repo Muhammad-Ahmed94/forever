@@ -18,10 +18,13 @@ interface cartInterface {
 
   getCartItems: () => Promise<void>;
   addToCart: (product: Product) => Promise<void>;
-  removeFromCart: (productId: string) => void;
+  removeFromCart: (productId: string) => Promise<void>;
   clearCart: () => Promise<void>;
   calculateTotals: () => void;
-  updateQuantity: (prouctId: string, quantity: number) => void;
+  updateQuantity: (prouctId: string, quantity: number) => Promise<void>;
+  getCoupon: () => Promise<void>;
+  applyCoupon: (code: string) => Promise<void>;
+  removeCoupon: () => void;
 }
 
 export const useCartStore = create<cartInterface>((set, get) => ({
@@ -124,4 +127,31 @@ export const useCartStore = create<cartInterface>((set, get) => ({
       toast.error("Could not update product quantity");
     }
   },
+
+  getCoupon: async () => {
+    try {
+      const res = await axiosInst.get("/coupon");
+      set({ coupon: res.data });
+    } catch (error) {
+      console.log("Error fetching coupon", error);
+    }
+  },
+
+  applyCoupon: async (code) => {
+    try {
+      const res = await axiosInst.post("/validateCoupon", { code });
+      set({ coupon: res.data, isCouponApplied: true });
+      toast.success("Coupon applied successfully");
+    } catch (error) {
+      if(axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message || "Failed to apply the coupon")
+      }
+    }
+  },
+
+  removeCoupon: () => {
+    set({ coupon: null, isCouponApplied: false });
+    get().calculateTotals();
+    toast.success("Coupon removed successfully");
+  }
 }));

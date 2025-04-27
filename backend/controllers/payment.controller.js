@@ -156,6 +156,8 @@ async function createStripeCoupon(discount) {
 
 // Create reward coupon
 async function createNewCoupon(userId) {
+  await couponModel.findOneAndDelete({ userId });
+  
   try {
     const newCoupon = new couponModel({
         code: "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase(),

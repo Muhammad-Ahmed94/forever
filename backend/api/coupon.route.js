@@ -5,6 +5,6 @@ import { protectRoute } from '../middleware/product.middleware.js';
 const router = express.Router()
 
 router.get("/", protectRoute, getCoupon);
-router.get("/validateCoupon", protectRoute, validateCoupon);
+router.post("/validateCoupon", protectRoute, validateCoupon);
 
 export default router;
