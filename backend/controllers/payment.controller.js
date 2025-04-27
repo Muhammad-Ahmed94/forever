@@ -94,6 +94,10 @@ export const createCheckoutSession = async (req, res) => {
 export const checkoutSuccess = async (req, res) => {
   try {
     const { sessionId } = req.body;
+    if (!sessionId) {
+      return res.status(400).json({ message: "Session ID is required" });
+    };
+
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if(session.payment_status !== "paid") {
@@ -101,6 +105,7 @@ export const checkoutSuccess = async (req, res) => {
     }
 
     if (session.payment_status === "paid") {
+      // off the coupon if used already
       if (session.metadata.couponCode) {
         await couponModel.findOneAndUpdate(
           {
@@ -113,6 +118,7 @@ export const checkoutSuccess = async (req, res) => {
         );
       }
 
+      // create order record
       const products = JSON.parse(session.metadata.products);
       const newOrder = new orderModel({
         user: session.metadata.userId,
@@ -126,8 +132,14 @@ export const checkoutSuccess = async (req, res) => {
       });
 
       await newOrder.save();
-      console.log(newOrder);
-      
+      console.log("order created successfully:", newOrder);
+
+      // New reward coupon if total amount exceed min threshhold of $200
+      if (session.amount_total / 100 >= 200) {
+        const newCoupon = await createNewCoupon(session.metadata.userId);
+        console.log("New reward coupon created:", newCoupon);
+      }
+
       res.status(200).json({
         success: true,
         message:
@@ -154,21 +166,25 @@ async function createStripeCoupon(discount) {
   }
 }
 
-// Create reward coupon
-async function createNewCoupon(userId) {
-  await couponModel.findOneAndDelete({ userId });
-  
+// Create reward coupon -- fixed function
+async function createNewCoupon(userId) {  
   try {
+  await couponModel.findOneAndDelete({ userId });
+
     const newCoupon = new couponModel({
         code: "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase(),
-        discount: 10,
-        expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        discount: 10, // 10% dis
+        expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), //30 days from now
         userId: userId,
+        isActive: true
     });
-    await newCoupon.save();
-    console.log(`Reward coupon generated for user:${userId}`);
-    return newCoupon
+    const savedCoupon = await newCoupon.save();
+    console.log(`Reward coupon generated for user:${userId}`, savedCoupon);
+
+    return savedCoupon;
   } catch (error) {
     console.error("Error creating reward coupon", error.message);
+    // Return null instead of letting the error propagate
+    return null;
   }
 }

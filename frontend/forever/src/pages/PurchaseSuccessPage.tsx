@@ -2,7 +2,7 @@ import { ArrowRight, CheckCircle, HandHeart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInst from "../lib/axios";
-import Confetti from 'react-confetti';
+import Confetti from "react-confetti";
 
 import { useCartStore } from "../stores/useCartStore";
 
@@ -12,29 +12,42 @@ const PurchaseSuccessPage = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const handlePaymentSucceess = async (sessionId: string) => {
+    const handlePaymentSuccess = async (sessionId: string) => {
       try {
         await axiosInst.post("/payment/checkout-success", { sessionId });
         clearCart();
+        setIsProcessing(false);
       } catch (error) {
         console.log(error);
-      } finally {
         setIsProcessing(false);
-      }
-      const urlSessionId = new URLSearchParams(window.location.search).get(
-        "session_id"
-      );
-      if (urlSessionId) {
-        handlePaymentSucceess(urlSessionId);
-      } else {
-        setIsProcessing(false);
-        setError("No session ID found in the URL");
+        setError("Error processing payment");
       }
     };
+
+    // Get session ID from URL and process payment
+    const urlSessionId = new URLSearchParams(window.location.search).get(
+      "session_id"
+    );
+    if (urlSessionId) {
+      handlePaymentSuccess(urlSessionId);
+    } else {
+      setIsProcessing(false);
+      setError("No session ID found in the URL");
+    }
   }, [clearCart]);
 
-  if (isProcessing) return "Processing ...";
-  if (error) return `Error: ${error}`;
+  if (isProcessing)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Processing payment...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="flex justify-center items-center h-screen text-red-500">
+        Error: {error}
+      </div>
+    );
 
   return (
     <div className="h-screen flex align-center px-4">
@@ -80,15 +93,15 @@ const PurchaseSuccessPage = () => {
           <div className="space-y-4">
             <button
               className="w-full text-font-main font-bold py-2 px-4
-             rounded-lg transition duration-300 flex align-center"
+             rounded-lg transition duration-300 flex align-center justify-center"
             >
               <HandHeart className="mr-2" size={18} />
               Thanks for trusting us!
             </button>
             <Link
               to={"/"}
-              className="w-full bg-gray-500 text-black/70 hover:bg-font-main hover:text-white  font-bold py-2 px-4 
-            rounded-lg transition duration-300 flex align-center"
+              className="w-full bg-gray-500 text-black/70 hover:bg-font-main hover:text-white font-bold py-2 px-4 
+              rounded-lg transition duration-300 flex align-center justify-center"
             >
               Continue Shopping
               <ArrowRight className="ml-2" size={18} />

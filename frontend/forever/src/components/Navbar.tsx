@@ -1,11 +1,25 @@
 import { ShoppingCart, User, Search, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import useUserStore from "../stores/useUserStore";
+import { useCartStore } from "../stores/useCartStore";
+import { useEffect } from "react";
 
 const Navbar = () => {
   const { user, logout } = useUserStore();
+  const { cart, getCartItems } = useCartStore();
   const isAdmin = user?.role === "admin";
 
+  // Total cart items
+  const cartItemCount = cart.reduce((total, item) => total + (item.quantity || 0), 0);
+
+  // load cartitem when user mount\when there is user
+  useEffect(() => {
+    if(user) {
+      getCartItems();
+    }
+  }, [user, getCartItems]);
+
+  // Log user out
   const handleLogout = () => {
     logout();
   };
@@ -60,11 +74,16 @@ const Navbar = () => {
           <button aria-label="User profile">
             <User />
           </button>
-          <button aria-label="Shopping cart">
-            <Link to="/cart">
+          <div className="relative">
+            <Link to="/cart" aria-label="Shopping cart">
               <ShoppingCart />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+                  {cartItemCount}
+                </span>
+              )}
             </Link>
-          </button>
+          </div>
 
           {isAdmin && (
             <Link
