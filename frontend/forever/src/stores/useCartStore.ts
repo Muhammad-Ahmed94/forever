@@ -19,6 +19,7 @@ interface cartInterface {
   getCartItems: () => Promise<void>;
   addToCart: (product: Product) => Promise<void>;
   removeFromCart: (productId: string) => void;
+  clearCart: () => Promise<void>;
   calculateTotals: () => void;
   updateQuantity: (prouctId: string, quantity: number) => void;
 }
@@ -86,6 +87,9 @@ export const useCartStore = create<cartInterface>((set, get) => ({
     }
   },
 
+  clearCart: async () => {
+    set({ cart: [], coupon: null, total: 0, subtotal: 0 });
+  },
   calculateTotals: () => {
     const { cart, coupon } = get();
     const subtotal = cart.reduce(

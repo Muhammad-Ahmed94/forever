@@ -126,7 +126,8 @@ export const checkoutSuccess = async (req, res) => {
       });
 
       await newOrder.save();
-
+      console.log(newOrder);
+      
       res.status(200).json({
         success: true,
         message:

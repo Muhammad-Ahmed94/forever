@@ -10,11 +10,13 @@ import AdminPage from "./pages/AdminPage"
 import GetProductByCategory from "./pages/GetProductByCategory"
 import CartPage from "./pages/CartPage"
 import CartInvalidPage from "./pages/CartInvalidPage"
+import PurchaseSuccessPage from "./pages/PurchaseSuccessPage"
+import PurchaseCancelPage from "./pages/PurchaseCancelPage"
 
 
 const App = () => {
   const {user, checkAuth} = useUserStore();
-  console.log(user?.role);
+  console.log(user?.role, user?.name);
   useEffect(() => {
     checkAuth();
   }, [checkAuth])
@@ -32,6 +34,8 @@ const App = () => {
           <Route path="/admin-dashboard" element={user?.role === 'admin' ? <AdminPage /> : <Navigate to="/login" />} />
           <Route path="/category/:category" element={<GetProductByCategory />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/purchase-success" element = {<PurchaseSuccessPage />} />
+          <Route path="/purchase-cancel" element = {<PurchaseCancelPage />} />
         </Routes>
         <Toaster />
       </div>

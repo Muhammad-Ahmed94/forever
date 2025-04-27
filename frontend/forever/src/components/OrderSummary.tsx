@@ -8,6 +8,7 @@ import axiosInst from '../lib/axios';
 const stripePromise = loadStripe(
   "pk_test_51PuII1AXJVcgr6sMELBssNlTSqwzroltERMazZlAkrmbLBeisyMcZAUMc4NruRBncr25i11wasSwqo4vc0ovvz6W00VSfNsaGH"
 );
+
 const OrderSummary = () => {
     const { total, subtotal, coupon, isCouponApplied, cart } = useCartStore();
     const savings = subtotal - total;
@@ -27,6 +28,7 @@ const OrderSummary = () => {
             console.error(error.response);
         }
     };
+
   return (
     <motion.div
       className="space-y-4 rounded-lg border border-gray-700 p-4 shadow-sm sm:p-6"
