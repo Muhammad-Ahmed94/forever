@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 const Navbar = () => {
   const { user, logout } = useUserStore();
-  const { cart, getCartItems } = useCartStore();
+  const { cart, getCartItems, clearCart } = useCartStore();
   const isAdmin = user?.role === "admin";
 
   // Total cart items
@@ -22,6 +22,7 @@ const Navbar = () => {
   // Log user out
   const handleLogout = () => {
     logout();
+    clearCart();
   };
 
   return (

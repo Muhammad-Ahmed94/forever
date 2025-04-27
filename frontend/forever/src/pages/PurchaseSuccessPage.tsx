@@ -5,22 +5,31 @@ import axiosInst from "../lib/axios";
 import Confetti from "react-confetti";
 
 import { useCartStore } from "../stores/useCartStore";
+import toast from "react-hot-toast";
 
 const PurchaseSuccessPage = () => {
   const [isProcessing, setIsProcessing] = useState(true);
   const { clearCart } = useCartStore();
   const [error, setError] = useState("");
+  const [orderId, setOrderId] = useState("");
 
   useEffect(() => {
     const handlePaymentSuccess = async (sessionId: string) => {
       try {
-        await axiosInst.post("/payment/checkout-success", { sessionId });
+        const response = await axiosInst.post("/payment/checkout-success", {
+          sessionId,
+        });
+        setOrderId(response.data.orderId);
         clearCart();
         setIsProcessing(false);
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        console.error(
+          "Payment processing error:",
+          error.response?.data || error.message
+        );
+        setError(error.response?.data?.message || "Error processing payment");
         setIsProcessing(false);
-        setError("Error processing payment");
+        toast.error("There was an issue processing your order confirmation");
       }
     };
 
@@ -39,18 +48,21 @@ const PurchaseSuccessPage = () => {
   if (isProcessing)
     return (
       <div className="flex justify-center items-center h-screen">
-        Processing payment...
+        Processing payment confirmation...
       </div>
     );
   if (error)
     return (
-      <div className="flex justify-center items-center h-screen text-red-500">
-        Error: {error}
+      <div className="flex flex-col justify-center items-center h-screen">
+        <div className="text-red-500 mb-4">Error: {error}</div>
+        <Link to="/" className="bg-gray-500 text-white px-4 py-2 rounded-lg">
+          Return to Homepage
+        </Link>
       </div>
     );
 
   return (
-    <div className="h-screen flex align-center px-4">
+    <div className="h-screen flex items-center justify-center px-4">
       <Confetti
         width={window.innerWidth}
         height={window.innerHeight}
@@ -79,7 +91,7 @@ const PurchaseSuccessPage = () => {
             <div className="flex align-center gap-2 mb-2">
               <span className="text-lg text-gray-700">Order number</span>
               <span className="text-lg font-semibold text-font-main">
-                #12345
+                #{orderId.substring(0, 8)}
               </span>
             </div>
             <div className="flex align-center gap-2">
@@ -93,7 +105,7 @@ const PurchaseSuccessPage = () => {
           <div className="space-y-4">
             <button
               className="w-full text-font-main font-bold py-2 px-4
-             rounded-lg transition duration-300 flex align-center justify-center"
+             rounded-lg transition duration-300 flex items-center justify-center"
             >
               <HandHeart className="mr-2" size={18} />
               Thanks for trusting us!
@@ -101,7 +113,7 @@ const PurchaseSuccessPage = () => {
             <Link
               to={"/"}
               className="w-full bg-gray-500 text-black/70 hover:bg-font-main hover:text-white font-bold py-2 px-4 
-              rounded-lg transition duration-300 flex align-center justify-center"
+              rounded-lg transition duration-300 flex items-center justify-center"
             >
               Continue Shopping
               <ArrowRight className="ml-2" size={18} />

@@ -96,12 +96,29 @@ export const checkoutSuccess = async (req, res) => {
     const { sessionId } = req.body;
     if (!sessionId) {
       return res.status(400).json({ message: "Session ID is required" });
+    }
+
+    // First check if an order with this sessionId already exists
+    const existingOrder = await orderModel.findOne({
+      stripeSessionId: sessionId,
+    });
+    if (existingOrder) {
+      console.log("Order already exists for this session:", existingOrder._id);
+      return res.status(200).json({
+        success: true,
+        message: "Order was already processed",
+        orderId: existingOrder._id,
+      });
     };
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    if(session.payment_status !== "paid") {
-      res.status(400).json({ message: "Payment not completed yet. Please proceed to pay first." })
+    if (session.payment_status !== "paid") {
+      res
+        .status(400)
+        .json({
+          message: "Payment not completed yet. Please proceed to pay first.",
+        });
     }
 
     if (session.payment_status === "paid") {
