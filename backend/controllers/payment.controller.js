@@ -181,6 +181,7 @@ async function createStripeCoupon(discount) {
       percent_off: discount,
       duration: "once",
     });
+    console.log("strie coupon:", coupon);
     return coupon.id;
   } catch (error) {
     console.error("Stripe coupon creation failed", error.message);

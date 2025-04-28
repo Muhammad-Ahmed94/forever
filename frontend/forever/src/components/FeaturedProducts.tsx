@@ -6,7 +6,11 @@ import useUserStore from "../stores/useUserStore";
 import toast from "react-hot-toast";
 import { redirect } from "react-router-dom";
 
-const FeaturedProducts = ({ featuredProducts }: {featuredProducts: Product[]}) => {
+const FeaturedProducts = ({
+  featuredProducts,
+}: {
+  featuredProducts: Product[];
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(4);
 
@@ -35,12 +39,13 @@ const FeaturedProducts = ({ featuredProducts }: {featuredProducts: Product[]}) =
   };
 
   const handleAddToCart = (product: Product) => {
-      if(!user) {
-        toast.error("Please log in to add items to your cart")
-        redirect("/login");
-      }
-      addToCart(product)
+    if (!user) {
+      toast.error("Please log in to add items to your cart");
+      redirect("/login");
     }
+    addToCart(product);
+  };
+
   return (
     <div className="py-12">
       <div className="container mx-auto px-4">
@@ -82,8 +87,7 @@ const FeaturedProducts = ({ featuredProducts }: {featuredProducts: Product[]}) =
                       </p>
                       <button
                         onClick={() => handleAddToCart(product)}
-                        className="w-full text-white bg-font-main font-semibold py-2 px-4 rounded transition-colors duration-300 
-												flex align-center"
+                        className="w-full flex items-center justify-center text-white bg-font-main font-semibold py-2 px-4 rounded transition-colors duration-300 hover:bg-font-main-dark"
                       >
                         <ShoppingCart className="w-5 h-5 mr-2" />
                         Add to Cart
@@ -95,9 +99,12 @@ const FeaturedProducts = ({ featuredProducts }: {featuredProducts: Product[]}) =
             </div>
           </div>
           <button
-            title="Prev silde"
+            title="Prev slide"
             onClick={prevSlide}
-            className={`absolute top-1/2 -left-4 transform -translate-y-1/2 p-2 rounded-full transition-colors duration-300 bg-gray-300 hover:bg-gray-500`}
+            disabled={currentIndex === 0}
+            className={`absolute top-1/2 -left-4 transform -translate-y-1/2 p-2 rounded-full transition-colors duration-300 bg-gray-300 hover:bg-gray-500 ${
+              currentIndex === 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -105,7 +112,12 @@ const FeaturedProducts = ({ featuredProducts }: {featuredProducts: Product[]}) =
           <button
             title="Next slide"
             onClick={nextSlide}
-            className={`absolute top-1/2 -right-4 transform -translate-y-1/2 p-2 rounded-full transition-colors duration-300 bg-gray-300 hover:bg-gray-500`}
+            disabled={currentIndex >= featuredProducts.length - itemsPerPage}
+            className={`absolute top-1/2 -right-4 transform -translate-y-1/2 p-2 rounded-full transition-colors duration-300 bg-gray-300 hover:bg-gray-500 ${
+              currentIndex >= featuredProducts.length - itemsPerPage
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -114,4 +126,5 @@ const FeaturedProducts = ({ featuredProducts }: {featuredProducts: Product[]}) =
     </div>
   );
 };
+
 export default FeaturedProducts;
