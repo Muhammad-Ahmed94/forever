@@ -150,7 +150,7 @@ export const refreshAccessToken = async (req, res) => {
   }
 };
 
-// TODO: implement later
+// Get looged in user
 export const getProfile = async (req, res) => {
 	try {
 		res.json(req.user);

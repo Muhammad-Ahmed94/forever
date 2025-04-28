@@ -7,10 +7,12 @@ interface userStoreInterface {
   user: any;
   loading: boolean;
   checkingAuth: boolean;
+
   signup: (name: string, email: string, password: string, confirmPassword: string) => void;
   login: (email: string, password: string) => void;
   logout: () => void;
   checkAuth: () => void;
+  refreshToken: () => Promise<void>;
 }
 
 const useUserStore = create<userStoreInterface>((set, get) => ({
@@ -88,5 +90,53 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       set({ checkingAuth: false, user: null });
     }
   },
+
+  refreshToken : async () => {
+    // Prevent multiple simultaneous refresh attempts
+    if (get().checkingAuth) return;
+
+    set({ checkingAuth: true });
+    try {
+      const res = await axiosInst.post("/auth/refresh-access-token");
+      set({ checkingAuth: false });
+      return res.data;
+    } catch (error) {
+      set({ user: null, checkingAuth: false });
+      throw error;
+    }
+  }
 }));
 export default useUserStore;
+
+let refreshPromise: Promise<any> | null = null;
+
+//* Axios interceptor to refresh access token
+axios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if(error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      console.log("original request turned on after time p");
+
+      try {
+        // if refresh is already in progress
+        if(refreshPromise) {
+          await refreshPromise;
+          return axios(originalRequest);
+        }
+
+        // start new refresh process
+        refreshPromise = useUserStore.getState().refreshToken();
+        await refreshPromise;
+        refreshPromise = null;
+
+        return axios(originalRequest);
+      } catch (error) {
+        useUserStore.getState().logout();
+        return Promise.reject(error);
+      }
+    }
+    return Promise.reject(error);
+  }
+)

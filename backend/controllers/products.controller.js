@@ -5,7 +5,6 @@ import cloudinary from "../lib/cloudinary.js";
 export const getProducts = async (req, res) => {
   try {
     const products = await productModel.find(); // get all products
-    console.log(`products: ${products}`);
     res.json({ products });
   } catch (error) {
     console.error(`Error fetching products`, error.message);
@@ -22,7 +21,6 @@ export const featuredProduct = async (req, res) => {
     - write it in redis under the key of "featured_product"
     */
     const product = await redis.get("featured_product");
-    console.log(`product: ${product}`);
     if (product) {
       return res.json(JSON.parse(product));
     }
@@ -30,7 +28,6 @@ export const featuredProduct = async (req, res) => {
     const featuredProduct = await productModel
       .find({ isFeatured: true })
       .lean();
-    console.log(`featured Product: ${featuredProduct}`);
     if (!featuredProduct.length) {
       return res.status(400).json({ message: "No featured product found" });
     }
@@ -54,7 +51,6 @@ export const createProduct = async (req, res) => {
       cloudinaryResponse = await cloudinary.uploader.upload(image, { folder: "product_images" });
       // store to "product_image" folder in cloudinary
     }
-    console.log(`image found: ${image}`);
 
     const product = await productModel.create({
       name,
@@ -77,7 +73,6 @@ export const createProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const productById = await productModel.findById(req.params.id);
-    console.log(`product found: ${productById}`);
 
     if (!productById) {
       return res.status(400).json({ message: "Product not found" });
@@ -87,7 +82,6 @@ export const deleteProduct = async (req, res) => {
       const publicId = productById.image.split("/").pop().split(".")[0];
       try {
         await cloudinary.uploader.destroy(`/products/${publicId}`);
-        console.log(`image deleted from cloudinary`);
         /* if above not work try then simply write (publicId) in parenthesis */
       } catch (error) {
         console.error(`error deleting the image from cloudinary`, error.message);
@@ -95,7 +89,6 @@ export const deleteProduct = async (req, res) => {
     }
     // now delete from DB
     await productModel.findByIdAndDelete(req.params.id);
-    console.log(`Product deleted from the database`);
     return res.status(200).json({ message: "product deleted successfully" });
   } catch (error) {
     console.error(`Error deleting the Product`, error.message);
@@ -117,7 +110,6 @@ export const recommendedProducts = async (req, res) => {
         }}
       ]
     );
-    console.log(`products: ${products}`);
     return res.json(products);
   } catch (error) {
     console.error(`Could not load recommended products`);

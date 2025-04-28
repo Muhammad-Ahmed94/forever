@@ -36,7 +36,6 @@ const CreateProductForm = () => {
       return alert("Please fill all required fields.");
     }
 
-    console.log(newProduct);
     try {
       await createProduct(newProduct);
       setNewProduct({

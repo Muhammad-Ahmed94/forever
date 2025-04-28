@@ -5,7 +5,7 @@ import orderModel from "../model/order.model.js";
 export const createCheckoutSession = async (req, res) => {
   try {
     const { products, couponCode } = req.body;
-    console.log(`Products: ${products} \n Coupon Code: ${couponCode}`);
+    console.log(`Coupon Code: ${couponCode}`);
 
     // check if we get products array from frontend checkout session req
     if (!Array.isArray(products) || products.length === 0) {
