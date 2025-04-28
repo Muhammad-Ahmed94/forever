@@ -3,15 +3,7 @@ import toast from "react-hot-toast";
 import axiosInst from "../lib/axios";
 import axios from "axios";
 
-interface Product {
-  name: string;
-  description: string;
-  price: string;
-  category: string;
-  image: string;
-  _id?: string;
-  isFeatured?:boolean;
-}
+import { Product } from "../types/Product";
 
 interface productStoreInterface {
   products: Product[];
@@ -21,6 +13,7 @@ interface productStoreInterface {
   getAllProducts: () => void;
   getProductsByCategory: (category: string) => void;
   activeFeatureProduct: (productId: string) => void;
+  getFeaturedProduct: () => void;
   deleteProduct: (productId: string) => void;
 }
 
@@ -29,6 +22,7 @@ export const useProductStore = create<productStoreInterface>((set, get) => ({
   loading: false,
 
   setProducts: (products) => set({ products }),
+
   createProduct: async (productData) => {
     set({ loading: true });
 
@@ -113,6 +107,18 @@ export const useProductStore = create<productStoreInterface>((set, get) => ({
       } else {
         toast.error("Failed to load products.");
       }
+    }
+  },
+
+  getFeaturedProduct: async () => {
+    set({ loading: true });
+
+    try {
+      const res = await axiosInst.get("/products/featured");
+      set({ products: res.data, loading: false });
+    } catch (error) {
+      set({ loading: false });
+      console.log("Error fetching featured products:", error);
     }
   },
 

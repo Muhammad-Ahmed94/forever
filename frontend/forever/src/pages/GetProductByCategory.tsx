@@ -13,7 +13,6 @@ const GetProductByCategory = () => {
     useEffect(() => {
       if (category) {
         getProductsByCategory(category);
-        console.log(products);
       } else {
         console.error("Category is undefined");
       }

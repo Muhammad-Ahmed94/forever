@@ -3,16 +3,9 @@ import useUserStore from "../stores/useUserStore";
 import toast from "react-hot-toast";
 import { useCartStore } from "../stores/useCartStore";
 
- interface productItemInterface {
-   _id?: string;
-   name: string;
-   description: string;
-   price: number; // changed to number
-   category: string;
-   image: string;
- };
+import { Product } from "../types/Product";
 
-const Item = ({ product }: { product: productItemInterface }) => {
+const Item = ({ product }: { product: Product }) => {
     const { user } = useUserStore();
     const { addToCart } = useCartStore();
 

@@ -1,13 +1,5 @@
 import { Link } from "react-router-dom";
-
-interface CategoryProps {
-  category: {
-    href: string;
-    name: string;
-    imageUrl: string;
-  };
-}
-
+import { CategoryProps } from "../types/Product";
 
 const CategoryItem: React.FC<CategoryProps> = ({ category }) => {
   return (
