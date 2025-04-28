@@ -3,11 +3,14 @@ import Formfield from "./Formfield";
 import { Plus } from "lucide-react";
 import { useProductStore } from "../stores/useProductStore";
 
+import { Product } from "../types/Product";
+// Add at the top of your file
+
 const CreateProductForm = () => {
-  const [newProduct, setNewProduct] = useState({
+  const [newProduct, setNewProduct] = useState<Product>({
     name: "",
     description: "",
-    price: "",
+    price: 0,
     category: "",
     image: "",
   });
@@ -41,7 +44,7 @@ const CreateProductForm = () => {
       setNewProduct({
         name: "",
         description: "",
-        price: "",
+        price: 0,
         category: "",
         image: "",
       });
@@ -97,9 +100,9 @@ const CreateProductForm = () => {
         <Formfield
           type="number"
           title="Price"
-          value={newProduct.price}
+          value={newProduct.price.toString()}
           onChange={(e) =>
-            setNewProduct({ ...newProduct, price: e.target.value })
+            setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })
           }
         />
         {/* CATEGORY */}

@@ -8,6 +8,7 @@ import { Product } from "../types/Product";
 interface productStoreInterface {
   products: Product[];
   loading: boolean;
+  
   setProducts: (products: Product[]) => void;
   createProduct: (productData: Product) => Promise<void>;
   getAllProducts: () => void;

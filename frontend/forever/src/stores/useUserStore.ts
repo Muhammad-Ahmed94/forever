@@ -52,7 +52,6 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
 
     try {
       const res = await axiosInst.post("/auth/login", { email, password });
-      console.log("Loggin in and:", res.data);
       set({ user: res.data.user, loading: false });
       toast.success("User logged in successfully");
     } catch (error) {
