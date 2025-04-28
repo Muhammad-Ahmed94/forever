@@ -86,7 +86,11 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       const res = await axiosInst.get("/auth/profile");
       set({ user: res.data.user, checkingAuth: false });
     } catch (error) {
-      set({ checkingAuth: false, user: null });
+      if(axios.isAxiosError(error) && error.response?.status === 401) {
+        set({ checkingAuth: false, user: null })
+      } else {
+        console.error("Error checking auth", error);
+      }
     }
   },
 
@@ -110,17 +114,23 @@ export default useUserStore;
 let refreshPromise: Promise<any> | null = null;
 
 //* Axios interceptor to refresh access token
-axios.interceptors.response.use(
+// Updated axios interceptor in useUserStore.ts
+axiosInst.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if(error.response?.status === 401 && !originalRequest._retry) {
+    // Check for token expiration or unauthorized error
+    if (
+      (error.response?.status === 401 || 
+       error.response?.data?.message === "Token expired") && 
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
-      console.log("original request turned on after time p");
+      console.log("Token expired, attempting refresh");
 
       try {
         // if refresh is already in progress
-        if(refreshPromise) {
+        if (refreshPromise) {
           await refreshPromise;
           return axios(originalRequest);
         }
@@ -131,9 +141,11 @@ axios.interceptors.response.use(
         refreshPromise = null;
 
         return axios(originalRequest);
-      } catch (error) {
+      } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
         useUserStore.getState().logout();
-        return Promise.reject(error);
+        toast.error("Session expired. Please log in again.");
+        return Promise.reject(refreshError);
       }
     }
     return Promise.reject(error);

@@ -9,14 +9,14 @@ import { useEffect } from "react"
 import AdminPage from "./pages/AdminPage"
 import GetProductByCategory from "./pages/GetProductByCategory"
 import CartPage from "./pages/CartPage"
-import CartInvalidPage from "./pages/CartInvalidPage"
 import PurchaseSuccessPage from "./pages/PurchaseSuccessPage"
 import PurchaseCancelPage from "./pages/PurchaseCancelPage"
 
-
 const App = () => {
   const {user, checkAuth} = useUserStore();
-  console.log(user?.role, user?.name);
+  if(user) {
+    console.log(user?.role, user?.name);
+  }
   useEffect(() => {
     checkAuth();
   }, [checkAuth])

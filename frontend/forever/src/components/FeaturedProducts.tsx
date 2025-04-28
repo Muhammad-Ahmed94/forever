@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCartStore } from "../stores/useCartStore";
 import { Product } from "../types/Product";
+import useUserStore from "../stores/useUserStore";
+import toast from "react-hot-toast";
+import { redirect } from "react-router-dom";
 
 const FeaturedProducts = ({ featuredProducts }: {featuredProducts: Product[]}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(4);
 
   const { addToCart } = useCartStore();
+  const { user } = useUserStore();
 
   useEffect(() => {
     const handleResize = () => {
@@ -30,6 +34,13 @@ const FeaturedProducts = ({ featuredProducts }: {featuredProducts: Product[]}) =
     setCurrentIndex((prevIndex) => prevIndex - itemsPerPage);
   };
 
+  const handleAddToCart = (product: Product) => {
+      if(!user) {
+        toast.error("Please log in to add items to your cart")
+        redirect("/login");
+      }
+      addToCart(product)
+    }
   return (
     <div className="py-12">
       <div className="container mx-auto px-4">
@@ -70,7 +81,7 @@ const FeaturedProducts = ({ featuredProducts }: {featuredProducts: Product[]}) =
                         ${product.price.toFixed(2)}
                       </p>
                       <button
-                        onClick={() => addToCart(product)}
+                        onClick={() => handleAddToCart(product)}
                         className="w-full text-white bg-font-main font-semibold py-2 px-4 rounded transition-colors duration-300 
 												flex align-center"
                       >

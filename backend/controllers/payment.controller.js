@@ -78,11 +78,14 @@ export const createCheckoutSession = async (req, res) => {
           }))
         ),
       },
+      // reduce analytics req
+      expand: ['payment_intent']
     });
 
     if (totalAmount >= 20000) { // if order exceeds $200, reward user with new coupon gift
       await createNewCoupon(req.user._id);
     }
+    console.log("Created Stripe session:", session.id);
     res.status(200).json({ id: session.id, totalAmount: totalAmount / 100 });
 
   } catch (error) {
@@ -137,6 +140,7 @@ export const checkoutSuccess = async (req, res) => {
 
       // create order record
       const products = JSON.parse(session.metadata.products);
+      console.log("About to create order with sessionId:", sessionId);
       const newOrder = new orderModel({
         user: session.metadata.userId,
         products: products.map((p) => ({
@@ -148,7 +152,8 @@ export const checkoutSuccess = async (req, res) => {
         stripeSessionId: sessionId,
       });
 
-      await newOrder.save();
+        await newOrder.save();
+      
       console.log("order created successfully:", newOrder);
 
       // New reward coupon if total amount exceed min threshhold of $200

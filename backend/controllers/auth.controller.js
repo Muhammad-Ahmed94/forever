@@ -107,7 +107,7 @@ export const logout = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     if (refreshToken) {
       const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
-      await redis.del(`Refresh_token:${decoded.userId}`);
+      await redis.del(`refresh_Token:${decoded.userId}`);
     }
 
     res.clearCookie("accessToken");

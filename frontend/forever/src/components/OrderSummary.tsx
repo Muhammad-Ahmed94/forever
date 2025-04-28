@@ -4,16 +4,20 @@ import { Link } from 'react-router-dom';
 import { MoveRight } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import axiosInst from '../lib/axios';
+import { useState } from 'react';
 
 const stripePromise = loadStripe(
   "pk_test_51PuII1AXJVcgr6sMELBssNlTSqwzroltERMazZlAkrmbLBeisyMcZAUMc4NruRBncr25i11wasSwqo4vc0ovvz6W00VSfNsaGH"
 );
 
 const OrderSummary = () => {
+  const [isPaying, setIsPaying] = useState(false);
     const { total, subtotal, coupon, isCouponApplied, cart } = useCartStore();
     const savings = subtotal - total;
 
     const handlePayment = async () => {
+      if(isPaying) return;
+      setIsPaying(true);
         try {
             const stripe = await stripePromise;
             const res = await axiosInst.post("/payment/create-checkout-session", {
@@ -26,6 +30,8 @@ const OrderSummary = () => {
             })
         } catch (error: any) {
             console.error(error.response);
+        } finally {
+          setIsPaying(false);
         }
     };
 
@@ -71,6 +77,7 @@ const OrderSummary = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handlePayment}
+          disabled={isPaying}
         >
           Proceed to Checkout
         </motion.button>

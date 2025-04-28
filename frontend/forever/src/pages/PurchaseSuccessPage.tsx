@@ -23,6 +23,15 @@ const PurchaseSuccessPage = () => {
         clearCart();
         setIsProcessing(false);
       } catch (error: any) {
+        // handle order was already processed as success
+        if(
+          error.response?.data?.message === "Order was already processed" && error.response?.data?.orderId
+        ) {
+          setOrderId(error.response.data.orderId);
+          clearCart();
+          setIsProcessing(false);
+          return;
+        }
         console.error(
           "Payment processing error:",
           error.response?.data || error.message
