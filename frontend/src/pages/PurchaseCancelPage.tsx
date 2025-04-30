@@ -1,6 +1,6 @@
+import { motion } from "framer-motion";
 import { ArrowLeft, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from 'framer-motion';
 const PurchaseCancelPage = () => {
   return (
     <div className="min-h-screen flex align-center px-4">
@@ -39,6 +39,6 @@ const PurchaseCancelPage = () => {
       </motion.div>
     </div>
   );
-}
+};
 
-export default PurchaseCancelPage
+export default PurchaseCancelPage;

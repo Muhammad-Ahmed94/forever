@@ -1,6 +1,6 @@
-import userModel from "../model/user.model.js";
 import jwt from "jsonwebtoken";
 import { redis } from "../lib/redis.js";
+import userModel from "../model/user.model.js";
 
 const generateTokens = (userId) => {
   const accessToken = jwt.sign({ userId }, process.env.ACCESSTOKEN_SECRET, {
@@ -134,7 +134,7 @@ export const refreshAccessToken = async (req, res) => {
     const accessToken = jwt.sign(
       { userId: decoded.userId },
       process.env.ACCESSTOKEN_SECRET,
-      { expiresIn: "5m" }
+      { expiresIn: "5m" },
     );
 
     res.cookie("accessToken", accessToken, {
@@ -152,9 +152,9 @@ export const refreshAccessToken = async (req, res) => {
 
 // Get looged in user
 export const getProfile = async (req, res) => {
-	try {
-		res.json(req.user);
-	} catch (error) {
-		res.status(500).json({ message: "Server error", error: error.message });
-	}
-}
+  try {
+    res.json(req.user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};

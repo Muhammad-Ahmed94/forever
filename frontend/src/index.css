@@ -2,35 +2,34 @@
 @layer components;
 
 @theme {
-    --color-bg-primary: #f0f0f0;
-    --color-logo-dot: #c586a5;
-    --color-font-main: #2a2a2a;
-    --color-border: #b2b2b2;
-    --color-hero-font: #414141;
-    --color-auth-color: #232323;
+  --color-bg-primary: #f0f0f0;
+  --color-logo-dot: #c586a5;
+  --color-font-main: #2a2a2a;
+  --color-border: #b2b2b2;
+  --color-hero-font: #414141;
+  --color-auth-color: #232323;
 
-    --color-latest-col-color: #707070;
-
+  --color-latest-col-color: #707070;
 }
 
 @layer components {
-    .nav-link {
-        @apply pb-2 hover:cursor-pointer hover:underline transition duration-200;
-    }
+  .nav-link {
+    @apply pb-2 hover:cursor-pointer hover:underline transition duration-200;
+  }
 
-    .auth-btn {
-        @apply bg-auth-color text-white px-4 py-2 text-center rounded font-medium;
-    }
+  .auth-btn {
+    @apply bg-auth-color text-white px-4 py-2 text-center rounded font-medium;
+  }
 
-    .align-center {
-        @apply justify-center items-center;
-    }
+  .align-center {
+    @apply justify-center items-center;
+  }
 
-    .border-red {
-        @apply border border-red-500;
-    }
+  .border-red {
+    @apply border border-red-500;
+  }
 
-    .table-header {
-        @apply px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider;
-    }
+  .table-header {
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider;
+  }
 }

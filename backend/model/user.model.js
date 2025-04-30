@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true, // Adds create at, update at...
-  }
+  },
 );
 
 // Hash password before saving to db (Pre-save)

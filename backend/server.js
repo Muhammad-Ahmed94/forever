@@ -1,16 +1,16 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import connectDB from "./lib/db.js";
 import compression from "compression";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
 import path from "path";
+import connectDB from "./lib/db.js";
 
 import authRoutes from "./api/auth.route.js";
-import productRoutes from "./api/product.route.js";
 import cartRoutes from "./api/cart.route.js";
 import couponRoute from "./api/coupon.route.js";
 import paymentRoute from "./api/payment.route.js";
+import productRoutes from "./api/product.route.js";
 
 dotenv.config();
 
@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === "production") {
 
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-  })
+  });
 }
 
 app.listen(PORT, () => {

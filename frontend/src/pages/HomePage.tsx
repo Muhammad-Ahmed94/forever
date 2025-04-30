@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import CategoryItem from "../components/CategoryItem";
-import { useProductStore } from "../stores/useProductStore";
 import FeaturedProducts from "../components/FeaturedProducts";
+import { useProductStore } from "../stores/useProductStore";
 
 const category = [
   { href: "/jeans", name: "Jeans", imageUrl: "/jeans.jpg" },
@@ -26,19 +26,22 @@ const HomePage = () => {
         <h1 className="text-center text-5xl sm:text-6xl font-bold">
           Explore our collections
         </h1>
-        <p className="text-center text-xl text-[#b2b2b2] mb-12">Discover our wide variety of collections at your tips</p>
+        <p className="text-center text-xl text-[#b2b2b2] mb-12">
+          Discover our wide variety of collections at your tips
+        </p>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-          {category.map(category => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {category.map((category) => (
             <CategoryItem key={category.name} category={category} />
           ))}
         </div>
 
-        {!loading && products.length > 0 && <FeaturedProducts featuredProducts={products} />}
-
+        {!loading && products.length > 0 && (
+          <FeaturedProducts featuredProducts={products} />
+        )}
       </div>
     </div>
   );
 };
 
-export default HomePage
+export default HomePage;

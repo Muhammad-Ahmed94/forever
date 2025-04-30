@@ -1,9 +1,9 @@
 import { ChartNoAxesCombined, Plus, ShoppingBasket } from "lucide-react";
 import { useState } from "react";
 
-import CreateProductForm from "../components/CreateProductForm";
 import AllProducts from "../components/AllProducts";
 import AnalyticsTab from "../components/AnalyticsTab";
+import CreateProductForm from "../components/CreateProductForm";
 
 const activeTabs = [
   { id: "create", label: "Add Product", icon: Plus },
@@ -34,9 +34,9 @@ const AdminPage = () => {
             </button>
           ))}
         </div>
-          {activeTab === "create" && <CreateProductForm />}
-          {activeTab === "products" && <AllProducts />}
-          {activeTab === "analytics" && <AnalyticsTab />}
+        {activeTab === "create" && <CreateProductForm />}
+        {activeTab === "products" && <AllProducts />}
+        {activeTab === "analytics" && <AnalyticsTab />}
       </div>
     </div>
   );

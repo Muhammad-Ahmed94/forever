@@ -1,22 +1,21 @@
+import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { motion } from 'framer-motion';
 
-import { useProductStore } from "../stores/useProductStore";
 import Item from "../components/Item";
-
+import { useProductStore } from "../stores/useProductStore";
 
 const GetProductByCategory = () => {
-    const { getProductsByCategory, products } = useProductStore();
-    const { category } = useParams();
+  const { getProductsByCategory, products } = useProductStore();
+  const { category } = useParams();
 
-    useEffect(() => {
-      if (category) {
-        getProductsByCategory(category);
-      } else {
-        console.error("Category is undefined");
-      }
-    }, [getProductsByCategory, category]);
+  useEffect(() => {
+    if (category) {
+      getProductsByCategory(category);
+    } else {
+      console.error("Category is undefined");
+    }
+  }, [getProductsByCategory, category]);
 
   return (
     <div className="min-h-screen">
@@ -49,6 +48,6 @@ const GetProductByCategory = () => {
       </div>
     </div>
   );
-}
+};
 
-export default GetProductByCategory
+export default GetProductByCategory;

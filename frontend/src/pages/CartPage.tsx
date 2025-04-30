@@ -1,12 +1,12 @@
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { useCartStore } from "../stores/useCartStore";
 
 import CartItem from "../components/CartItem";
-import OrderSummary from "../components/OrderSummary";
 import CouponCard from "../components/CouponCard";
+import OrderSummary from "../components/OrderSummary";
 
 const CartPage = () => {
   const { cart } = useCartStore();

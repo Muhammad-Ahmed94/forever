@@ -1,10 +1,10 @@
+import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
-import { useCartStore } from "../stores/useCartStore";
-import { Product } from "../types/Product";
-import useUserStore from "../stores/useUserStore";
 import toast from "react-hot-toast";
 import { redirect } from "react-router-dom";
+import { useCartStore } from "../stores/useCartStore";
+import useUserStore from "../stores/useUserStore";
+import { Product } from "../types/Product";
 
 const FeaturedProducts = ({
   featuredProducts,

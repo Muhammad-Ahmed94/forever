@@ -1,14 +1,19 @@
-import { create } from "zustand";
-import { toast } from "react-hot-toast";
-import axiosInst from "../lib/axios";
 import axios from "axios";
+import { toast } from "react-hot-toast";
+import { create } from "zustand";
+import axiosInst from "../lib/axios";
 
 interface userStoreInterface {
   user: any;
   loading: boolean;
   checkingAuth: boolean;
 
-  signup: (name: string, email: string, password: string, confirmPassword: string) => void;
+  signup: (
+    name: string,
+    email: string,
+    password: string,
+    confirmPassword: string,
+  ) => void;
   login: (email: string, password: string) => void;
   logout: () => void;
   checkAuth: () => void;
@@ -34,7 +39,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
         password,
       });
       set({ user: res.data.user, loading: false });
-      toast.success("Account created successfully")
+      toast.success("Account created successfully");
       console.log(res.data);
     } catch (error) {
       set({ loading: false });
@@ -57,7 +62,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
     } catch (error) {
       if (axios.isAxiosError(error) && error.message) {
         return toast.error(
-          error.response?.data.message || "Login error occured"
+          error.response?.data.message || "Login error occured",
         );
       } else {
         toast.error("Unexpected error occured");
@@ -73,7 +78,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
     } catch (error) {
       if (axios.isAxiosError(error) && error.message) {
         return toast.error(
-          error.response?.data?.message || "An error occured while logging out"
+          error.response?.data?.message || "An error occured while logging out",
         );
       }
     }
@@ -86,15 +91,15 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       const res = await axiosInst.get("/auth/profile");
       set({ user: res.data.user, checkingAuth: false });
     } catch (error) {
-      if(axios.isAxiosError(error) && error.response?.status === 401) {
-        set({ checkingAuth: false, user: null })
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        set({ checkingAuth: false, user: null });
       } else {
         console.error("Error checking auth", error);
       }
     }
   },
 
-  refreshToken : async () => {
+  refreshToken: async () => {
     // Prevent multiple simultaneous refresh attempts
     if (get().checkingAuth) return;
 
@@ -107,7 +112,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       set({ user: null, checkingAuth: false });
       throw error;
     }
-  }
+  },
 }));
 export default useUserStore;
 
@@ -121,8 +126,8 @@ axiosInst.interceptors.response.use(
     const originalRequest = error.config;
     // Check for token expiration or unauthorized error
     if (
-      (error.response?.status === 401 || 
-       error.response?.data?.message === "Token expired") && 
+      (error.response?.status === 401 ||
+        error.response?.data?.message === "Token expired") &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
@@ -149,5 +154,5 @@ axiosInst.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
-)
+  },
+);

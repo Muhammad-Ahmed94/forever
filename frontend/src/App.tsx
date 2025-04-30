@@ -1,16 +1,16 @@
-import { Navigate, Route, Routes } from "react-router-dom"
-import HomePage from "./pages/HomePage"
-import SignUpPage from "./pages/SignUpPage"
-import LoginPage from "./pages/LoginPage"
-import Navbar from "./components/Navbar"
-import { Toaster } from "react-hot-toast"
-import useUserStore from "./stores/useUserStore"
-import { useEffect } from "react"
-import AdminPage from "./pages/AdminPage"
-import GetProductByCategory from "./pages/GetProductByCategory"
-import CartPage from "./pages/CartPage"
-import PurchaseSuccessPage from "./pages/PurchaseSuccessPage"
-import PurchaseCancelPage from "./pages/PurchaseCancelPage"
+import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+import { Navigate, Route, Routes } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import AdminPage from "./pages/AdminPage";
+import CartPage from "./pages/CartPage";
+import GetProductByCategory from "./pages/GetProductByCategory";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import PurchaseCancelPage from "./pages/PurchaseCancelPage";
+import PurchaseSuccessPage from "./pages/PurchaseSuccessPage";
+import SignUpPage from "./pages/SignUpPage";
+import useUserStore from "./stores/useUserStore";
 
 const App = () => {
   const { user, checkAuth } = useUserStore();
@@ -71,6 +71,6 @@ PurchaseSuccessPage.tsx:35
       </div>
     </div>
   );
-}
+};
 
-export default App
+export default App;

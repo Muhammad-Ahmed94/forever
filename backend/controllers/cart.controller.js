@@ -9,7 +9,7 @@ export const getAllCartProducts = async (req, res) => {
     // add quantity for each product
     const cartItems = products.map((product) => {
       const item = req.user.cartItems.find(
-        (cartItem) => cartItem.id === product.id
+        (cartItem) => cartItem.id === product.id,
       );
       return { ...product.toJSON(), quantity: item.quantity };
     });
@@ -49,7 +49,7 @@ export const deleteCartProduct = async (req, res) => {
     if (!productId) {
       user.cartItems = [];
     } else {
-      user.cartItems = user.cartItems.filter(item => item.id !== productId);
+      user.cartItems = user.cartItems.filter((item) => item.id !== productId);
     }
     await user.save();
     res.json(user.cartItems);

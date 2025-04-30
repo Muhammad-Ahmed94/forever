@@ -1,8 +1,8 @@
-import { ShoppingCart, User, Search, Lock } from "lucide-react";
-import { Link } from "react-router-dom";
-import useUserStore from "../stores/useUserStore";
-import { useCartStore } from "../stores/useCartStore";
+import { Lock, Search, ShoppingCart, User } from "lucide-react";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useCartStore } from "../stores/useCartStore";
+import useUserStore from "../stores/useUserStore";
 
 const Navbar = () => {
   const { user, logout } = useUserStore();
@@ -10,11 +10,14 @@ const Navbar = () => {
   const isAdmin = user?.role === "admin";
 
   // Total cart items
-  const cartItemCount = cart.reduce((total, item) => total + (item.quantity || 0), 0);
+  const cartItemCount = cart.reduce(
+    (total, item) => total + (item.quantity || 0),
+    0,
+  );
 
   // load cartitem when user mount\when there is user
   useEffect(() => {
-    if(user) {
+    if (user) {
       getCartItems();
     }
   }, [user, getCartItems]);

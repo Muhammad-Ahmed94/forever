@@ -1,8 +1,8 @@
+import { ArrowRight } from "lucide-react";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Button from "../components/Button";
 import Formfield from "../components/Formfield";
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import useUserStore from "../stores/useUserStore";
 
 const LoginPage = () => {

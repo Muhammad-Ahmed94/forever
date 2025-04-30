@@ -1,11 +1,11 @@
 import { ArrowRight, CheckCircle, HandHeart } from "lucide-react";
 import { useEffect, useState } from "react";
+import Confetti from "react-confetti";
 import { Link } from "react-router-dom";
 import axiosInst from "../lib/axios";
-import Confetti from "react-confetti";
 
-import { useCartStore } from "../stores/useCartStore";
 import toast from "react-hot-toast";
+import { useCartStore } from "../stores/useCartStore";
 
 const PurchaseSuccessPage = () => {
   const [isProcessing, setIsProcessing] = useState(true);
@@ -24,8 +24,9 @@ const PurchaseSuccessPage = () => {
         setIsProcessing(false);
       } catch (error: any) {
         // handle order was already processed as success
-        if(
-          error.response?.data?.message === "Order was already processed" && error.response?.data?.orderId
+        if (
+          error.response?.data?.message === "Order was already processed" &&
+          error.response?.data?.orderId
         ) {
           setOrderId(error.response.data.orderId);
           clearCart();
@@ -34,7 +35,7 @@ const PurchaseSuccessPage = () => {
         }
         console.error(
           "Payment processing error:",
-          error.response?.data || error.message
+          error.response?.data || error.message,
         );
         setError(error.response?.data?.message || "Error processing payment");
         setIsProcessing(false);
@@ -44,7 +45,7 @@ const PurchaseSuccessPage = () => {
 
     // Get session ID from URL and process payment
     const urlSessionId = new URLSearchParams(window.location.search).get(
-      "session_id"
+      "session_id",
     );
     if (urlSessionId) {
       handlePaymentSuccess(urlSessionId);

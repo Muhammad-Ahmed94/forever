@@ -1,8 +1,8 @@
+import { ArrowRight } from "lucide-react";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Button from "../components/Button";
 import Formfield from "../components/Formfield";
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import useUserStore from "../stores/useUserStore";
 
 const SignUpPage = () => {
@@ -13,7 +13,7 @@ const SignUpPage = () => {
     confirmPassword: "",
   });
 
-  const {signup} = useUserStore();
+  const { signup } = useUserStore();
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +21,7 @@ const SignUpPage = () => {
       formData.name,
       formData.email,
       formData.password,
-      formData.confirmPassword
+      formData.confirmPassword,
     );
 
     console.log("signup complete");

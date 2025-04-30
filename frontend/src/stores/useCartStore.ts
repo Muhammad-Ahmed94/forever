@@ -1,7 +1,7 @@
+import axios from "axios";
+import toast from "react-hot-toast";
 import { create } from "zustand";
 import axiosInst from "../lib/axios";
-import toast from "react-hot-toast";
-import axios from "axios";
 
 import { Product } from "../types/Product";
 
@@ -55,13 +55,13 @@ export const useCartStore = create<cartInterface>((set, get) => ({
 
       set((prevState) => {
         const existingItem = prevState.cart.find(
-          (item) => item._id === product._id
+          (item) => item._id === product._id,
         );
         const newCart = existingItem
           ? prevState.cart.map((item) =>
               item._id === product._id
                 ? { ...item, quantity: (item.quantity || 0) + 1 }
-                : item
+                : item,
             )
           : [...prevState.cart, { ...product, quantity: 1 }];
 
@@ -97,7 +97,7 @@ export const useCartStore = create<cartInterface>((set, get) => ({
     const { cart, coupon } = get();
     const subtotal = cart.reduce(
       (sum, item) => sum + item.price * (item.quantity || 1),
-      0
+      0,
     );
     let total = subtotal;
 
@@ -119,7 +119,7 @@ export const useCartStore = create<cartInterface>((set, get) => ({
       await axiosInst.put(`/cart/${productId}`, { quantity });
       set((prevState) => ({
         cart: prevState.cart.map((item) =>
-          item._id === productId ? { ...item, quantity } : item
+          item._id === productId ? { ...item, quantity } : item,
         ),
       }));
       get().calculateTotals();
@@ -143,8 +143,10 @@ export const useCartStore = create<cartInterface>((set, get) => ({
       set({ coupon: res.data, isCouponApplied: true });
       toast.success("Coupon applied successfully");
     } catch (error) {
-      if(axios.isAxiosError(error) && error.response) {
-        toast.error(error.response.data.message || "Failed to apply the coupon")
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(
+          error.response.data.message || "Failed to apply the coupon",
+        );
       }
     }
   },
@@ -153,5 +155,5 @@ export const useCartStore = create<cartInterface>((set, get) => ({
     set({ coupon: null, isCouponApplied: false });
     get().calculateTotals();
     toast.success("Coupon removed successfully");
-  }
+  },
 }));

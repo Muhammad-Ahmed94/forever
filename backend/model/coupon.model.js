@@ -5,7 +5,7 @@ const couponSchema = new mongoose.Schema(
     code: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
     expirationDate: {
       type: Date,
@@ -29,7 +29,7 @@ const couponSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const couponModel = mongoose.model("Coupon", couponSchema);

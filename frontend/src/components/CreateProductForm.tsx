@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import Formfield from "./Formfield";
 import { Plus } from "lucide-react";
+import React, { useState } from "react";
 import { useProductStore } from "../stores/useProductStore";
+import Formfield from "./Formfield";
 
 import { Product } from "../types/Product";
 // Add at the top of your file

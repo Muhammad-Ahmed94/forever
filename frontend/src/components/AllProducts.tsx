@@ -1,9 +1,10 @@
+import { Star, Trash } from "lucide-react";
 import { useEffect } from "react";
 import { useProductStore } from "../stores/useProductStore";
-import { Star, Trash } from "lucide-react";
 
 const AllProducts = () => {
-  const { getAllProducts, activeFeatureProduct, deleteProduct, products } = useProductStore();
+  const { getAllProducts, activeFeatureProduct, deleteProduct, products } =
+    useProductStore();
 
   useEffect(() => {
     getAllProducts();

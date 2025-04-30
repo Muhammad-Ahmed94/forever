@@ -1,4 +1,4 @@
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import userModel from "../model/user.model.js";
 
 export const protectRoute = async (req, res, next) => {
@@ -15,7 +15,7 @@ export const protectRoute = async (req, res, next) => {
 
       const user = await userModel.findById(decoded.userId).select("-password");
       console.log(`user: ${user.name}`);
-      if(!user) return res.status(401).json({ message: "Unauthorized" });
+      if (!user) return res.status(401).json({ message: "Unauthorized" });
 
       req.user = user;
     } catch (error) {
@@ -31,10 +31,10 @@ export const protectRoute = async (req, res, next) => {
 };
 
 export const adminRoute = (req, res, next) => {
-    if(req.user && req.user.role === 'admin') {
-        console.log(`user role: ${req.user.role}`);
-        next();
-    } else {
-        res.status(403).json({ message: "Access denied - Admin only" });
-    }
-}
+  if (req.user && req.user.role === "admin") {
+    console.log(`user role: ${req.user.role}`);
+    next();
+  } else {
+    res.status(403).json({ message: "Access denied - Admin only" });
+  }
+};

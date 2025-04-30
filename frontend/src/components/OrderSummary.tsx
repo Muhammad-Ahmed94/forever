@@ -1,39 +1,39 @@
-import { motion } from 'framer-motion';
-import { useCartStore } from '../stores/useCartStore';
-import { Link } from 'react-router-dom';
-import { MoveRight } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
-import axiosInst from '../lib/axios';
-import { useState } from 'react';
+import { loadStripe } from "@stripe/stripe-js";
+import { motion } from "framer-motion";
+import { MoveRight } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import axiosInst from "../lib/axios";
+import { useCartStore } from "../stores/useCartStore";
 
 const stripePromise = loadStripe(
-  "pk_test_51PuII1AXJVcgr6sMELBssNlTSqwzroltERMazZlAkrmbLBeisyMcZAUMc4NruRBncr25i11wasSwqo4vc0ovvz6W00VSfNsaGH"
+  "pk_test_51PuII1AXJVcgr6sMELBssNlTSqwzroltERMazZlAkrmbLBeisyMcZAUMc4NruRBncr25i11wasSwqo4vc0ovvz6W00VSfNsaGH",
 );
 
 const OrderSummary = () => {
   const [isPaying, setIsPaying] = useState(false);
-    const { total, subtotal, coupon, isCouponApplied, cart } = useCartStore();
-    const savings = subtotal - total;
+  const { total, subtotal, coupon, isCouponApplied, cart } = useCartStore();
+  const savings = subtotal - total;
 
-    const handlePayment = async () => {
-      if(isPaying) return;
-      setIsPaying(true);
-        try {
-            const stripe = await stripePromise;
-            const res = await axiosInst.post("/payment/create-checkout-session", {
-                products: cart,
-                couponCode: coupon ? coupon.code : null
-            });
-            const session = res.data;
-            await stripe?.redirectToCheckout({
-                sessionId: session.id
-            })
-        } catch (error: any) {
-            console.error(error.response);
-        } finally {
-          setIsPaying(false);
-        }
-    };
+  const handlePayment = async () => {
+    if (isPaying) return;
+    setIsPaying(true);
+    try {
+      const stripe = await stripePromise;
+      const res = await axiosInst.post("/payment/create-checkout-session", {
+        products: cart,
+        couponCode: coupon ? coupon.code : null,
+      });
+      const session = res.data;
+      await stripe?.redirectToCheckout({
+        sessionId: session.id,
+      });
+    } catch (error: any) {
+      console.error(error.response);
+    } finally {
+      setIsPaying(false);
+    }
+  };
 
   return (
     <motion.div
@@ -95,6 +95,6 @@ const OrderSummary = () => {
       </div>
     </motion.div>
   );
-}
+};
 
-export default OrderSummary
+export default OrderSummary;

@@ -1,7 +1,5 @@
 const AnalyticsTab = () => {
-  return (
-    <div>AnalyticsTab</div>
-  )
-}
+  return <div>AnalyticsTab</div>;
+};
 
-export default AnalyticsTab
+export default AnalyticsTab;

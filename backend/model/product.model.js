@@ -28,7 +28,7 @@ const productSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const productModel = mongoose.model("Product", productSchema);

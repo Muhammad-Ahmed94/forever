@@ -9,7 +9,9 @@ export const createCheckoutSession = async (req, res) => {
 
     // check if we get products array from frontend checkout session req
     if (!Array.isArray(products) || products.length === 0) {
-      return res.status(400).json({ message: "Invalid or products array does not exist" });
+      return res
+        .status(400)
+        .json({ message: "Invalid or products array does not exist" });
     }
 
     /* 
@@ -24,7 +26,8 @@ export const createCheckoutSession = async (req, res) => {
       totalAmount += amount * product.quantity; // total amount in cents
       console.log(`Total Amount: ${totalAmount}`);
 
-      return { // return stripe friendly line-items
+      return {
+        // return stripe friendly line-items
         price_data: {
           currency: "usd",
           product_data: {
@@ -33,7 +36,7 @@ export const createCheckoutSession = async (req, res) => {
           },
           unit_amount: amount,
         },
-        quantity: product.quantity
+        quantity: product.quantity,
       };
     });
 
@@ -49,7 +52,9 @@ export const createCheckoutSession = async (req, res) => {
         isActive: true,
       });
       if (!coupon) {
-        return res.status(400).json({ message: "Invalid or expired coupon code." });
+        return res
+          .status(400)
+          .json({ message: "Invalid or expired coupon code." });
       }
     }
 
@@ -75,21 +80,24 @@ export const createCheckoutSession = async (req, res) => {
             id: p._id,
             quantity: p.quantity,
             price: p.price,
-          }))
+          })),
         ),
       },
       // reduce analytics req
-      expand: ['payment_intent']
+      expand: ["payment_intent"],
     });
 
-    if (totalAmount >= 20000) { // if order exceeds $200, reward user with new coupon gift
+    if (totalAmount >= 20000) {
+      // if order exceeds $200, reward user with new coupon gift
       await createNewCoupon(req.user._id);
     }
     console.log("Created Stripe session:", session.id);
     res.status(200).json({ id: session.id, totalAmount: totalAmount / 100 });
-
   } catch (error) {
-    console.error("Could not complete the order payment. Checkout session failed", error.message);
+    console.error(
+      "Could not complete the order payment. Checkout session failed",
+      error.message,
+    );
     res.status(500).json({ message: "Server Error. Payment failed." });
   }
 };
@@ -112,16 +120,14 @@ export const checkoutSuccess = async (req, res) => {
         message: "Order was already processed",
         orderId: existingOrder._id,
       });
-    };
+    }
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status !== "paid") {
-      res
-        .status(400)
-        .json({
-          message: "Payment not completed yet. Please proceed to pay first.",
-        });
+      res.status(400).json({
+        message: "Payment not completed yet. Please proceed to pay first.",
+      });
     }
 
     if (session.payment_status === "paid") {
@@ -134,7 +140,7 @@ export const checkoutSuccess = async (req, res) => {
           },
           {
             isActive: false,
-          }
+          },
         );
       }
 
@@ -152,8 +158,8 @@ export const checkoutSuccess = async (req, res) => {
         stripeSessionId: sessionId,
       });
 
-        await newOrder.save();
-      
+      await newOrder.save();
+
       console.log("order created successfully:", newOrder);
 
       // New reward coupon if total amount exceed min threshhold of $200
@@ -190,16 +196,16 @@ async function createStripeCoupon(discount) {
 }
 
 // Create reward coupon -- fixed function
-async function createNewCoupon(userId) {  
+async function createNewCoupon(userId) {
   try {
-  await couponModel.findOneAndDelete({ userId });
+    await couponModel.findOneAndDelete({ userId });
 
     const newCoupon = new couponModel({
-        code: "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase(),
-        discount: 10, // 10% dis
-        expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), //30 days from now
-        userId: userId,
-        isActive: true
+      code: "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase(),
+      discount: 10, // 10% dis
+      expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), //30 days from now
+      userId: userId,
+      isActive: true,
     });
     const savedCoupon = await newCoupon.save();
     console.log(`Reward coupon generated for user:${userId}`, savedCoupon);

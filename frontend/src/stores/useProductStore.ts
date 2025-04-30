@@ -1,14 +1,14 @@
-import { create } from "zustand";
-import toast from "react-hot-toast";
-import axiosInst from "../lib/axios";
 import axios from "axios";
+import toast from "react-hot-toast";
+import { create } from "zustand";
+import axiosInst from "../lib/axios";
 
 import { Product } from "../types/Product";
 
 interface productStoreInterface {
   products: Product[];
   loading: boolean;
-  
+
   setProducts: (products: Product[]) => void;
   createProduct: (productData: Product) => Promise<void>;
   getAllProducts: () => void;
@@ -18,7 +18,7 @@ interface productStoreInterface {
   deleteProduct: (productId: string) => void;
 }
 
-export const useProductStore = create<productStoreInterface>((set,) => ({
+export const useProductStore = create<productStoreInterface>((set) => ({
   products: [],
   loading: false,
 
@@ -38,7 +38,7 @@ export const useProductStore = create<productStoreInterface>((set,) => ({
       set({ loading: false });
       if (axios.isAxiosError(error) && error.message) {
         toast.error(
-          error.response?.data.message || "Error posting new product"
+          error.response?.data.message || "Error posting new product",
         );
       } else {
         toast.error("Error occured while creating new product");
@@ -59,7 +59,7 @@ export const useProductStore = create<productStoreInterface>((set,) => ({
       if (axios.isAxiosError(error) && error.response) {
         return toast.error(
           error.response?.data.message ||
-            "Error occured while getting products from DB"
+            "Error occured while getting products from DB",
         );
       } else {
         toast.error("Failed to load products.");
@@ -74,8 +74,10 @@ export const useProductStore = create<productStoreInterface>((set,) => ({
       const res = await axiosInst.get(`/products/category/${category}`);
       set({ products: res.data.products, loading: false });
     } catch (error) {
-      if(axios.isAxiosError(error) && error.response) {
-        return toast.error(error.response.data.message || "Error fetching product by category");
+      if (axios.isAxiosError(error) && error.response) {
+        return toast.error(
+          error.response.data.message || "Error fetching product by category",
+        );
       }
     }
   },
@@ -93,7 +95,7 @@ export const useProductStore = create<productStoreInterface>((set,) => ({
         products: prevState.products.map((product) =>
           product._id === productId
             ? { ...product, isFeatured: res.data.isFeatured }
-            : product
+            : product,
         ),
         loading: false,
       }));
@@ -103,7 +105,7 @@ export const useProductStore = create<productStoreInterface>((set,) => ({
       if (axios.isAxiosError(error) && error.response) {
         return toast.error(
           error.response?.data.message ||
-            "Error occured while getting products from DB"
+            "Error occured while getting products from DB",
         );
       } else {
         toast.error("Failed to load products.");
@@ -129,18 +131,18 @@ export const useProductStore = create<productStoreInterface>((set,) => ({
     console.log("after loading false");
 
     try {
-    console.log("before axios");
+      console.log("before axios");
 
       await axiosInst.delete(`/products/${productId}`);
-    console.log("after axios");
+      console.log("after axios");
 
       set((prevState) => ({
         products: prevState.products.filter(
-          (product) => product._id !== productId
+          (product) => product._id !== productId,
         ),
         loading: false,
       }));
-    console.log("after ssetting delete");
+      console.log("after ssetting delete");
 
       toast.success("Product deleted successfully");
     } catch (error) {
@@ -148,7 +150,7 @@ export const useProductStore = create<productStoreInterface>((set,) => ({
       if (axios.isAxiosError(error) && error.response) {
         return toast.error(
           error.response?.data.message ||
-            "Error occured while getting products from DB"
+            "Error occured while getting products from DB",
         );
       } else {
         toast.error("Failed to load products.");

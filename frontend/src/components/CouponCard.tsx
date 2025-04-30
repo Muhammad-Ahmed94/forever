@@ -1,28 +1,29 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { useCartStore } from '../stores/useCartStore';
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useCartStore } from "../stores/useCartStore";
 
 const CouponCard = () => {
-    const [userInputCode, setUserInputCode] = useState("");
-    const { coupon, isCouponApplied, getCoupon, applyCoupon, removeCoupon } = useCartStore();
+  const [userInputCode, setUserInputCode] = useState("");
+  const { coupon, isCouponApplied, getCoupon, applyCoupon, removeCoupon } =
+    useCartStore();
 
-    useEffect(() => {
-      getCoupon();
-    }, [getCoupon]);
+  useEffect(() => {
+    getCoupon();
+  }, [getCoupon]);
 
-    useEffect(() => {
-      if (coupon) setUserInputCode(coupon.code);
-    }, [coupon]);
+  useEffect(() => {
+    if (coupon) setUserInputCode(coupon.code);
+  }, [coupon]);
 
-    const handleApplyCoupon = () => {
-      if(!userInputCode) return;
-      applyCoupon(userInputCode);
-    };
+  const handleApplyCoupon = () => {
+    if (!userInputCode) return;
+    applyCoupon(userInputCode);
+  };
 
-    const handleRemoveCoupon = async () => {
-      await removeCoupon();
-      setUserInputCode("");
-    };
+  const handleRemoveCoupon = async () => {
+    await removeCoupon();
+    setUserInputCode("");
+  };
 
   return (
     <motion.div
@@ -95,6 +96,6 @@ const CouponCard = () => {
       )}
     </motion.div>
   );
-}
+};
 
-export default CouponCard
+export default CouponCard;
