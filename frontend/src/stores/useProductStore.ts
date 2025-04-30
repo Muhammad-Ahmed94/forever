@@ -18,7 +18,7 @@ interface productStoreInterface {
   deleteProduct: (productId: string) => void;
 }
 
-export const useProductStore = create<productStoreInterface>((set, get) => ({
+export const useProductStore = create<productStoreInterface>((set,) => ({
   products: [],
   loading: false,
 

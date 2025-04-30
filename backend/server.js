@@ -34,10 +34,10 @@ app.use("/api/coupon", couponRoute);
 app.use("/api/payment", paymentRoute);
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "frontend/forever/dist")));
+  app.use(express.static(path.join(__dirname, "frontend/dist")));
 
   app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "frontend", "forever", "dist", "index.html"));
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
   })
 }
 

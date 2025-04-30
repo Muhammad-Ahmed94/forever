@@ -13,6 +13,7 @@
     "@stripe/stripe-js": "^7.0.0",
     "@tailwindcss/vite": "^4.1.4",
     "axios": "^1.8.4",
+    "forever": "file:..",
     "framer-motion": "^12.6.3",
     "lucide-react": "^0.487.0",
     "react": "^19.0.0",
@@ -21,8 +22,8 @@
     "react-hot-toast": "^2.5.2",
     "react-router-dom": "^7.5.0",
     "recharts": "^2.15.2",
-    "zustand": "^5.0.3",
-    "tailwindcss": "^4.1.3"
+    "tailwindcss": "^4.1.3",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
