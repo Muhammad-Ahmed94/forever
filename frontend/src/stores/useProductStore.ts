@@ -83,13 +83,9 @@ export const useProductStore = create<productStoreInterface>((set) => ({
   },
 
   activeFeatureProduct: async (productId) => {
-    console.log("before loading false");
-
     set({ loading: true });
     try {
-      console.log("before res");
       const res = await axiosInst.patch(`/products/${productId}`);
-      console.log("after res");
 
       set((prevState) => ({
         products: prevState.products.map((product) =>
@@ -126,15 +122,10 @@ export const useProductStore = create<productStoreInterface>((set) => ({
   },
 
   deleteProduct: async (productId) => {
-    console.log("before loading false");
     set({ loading: true });
-    console.log("after loading false");
 
     try {
-      console.log("before axios");
-
       await axiosInst.delete(`/products/${productId}`);
-      console.log("after axios");
 
       set((prevState) => ({
         products: prevState.products.filter(
@@ -142,8 +133,7 @@ export const useProductStore = create<productStoreInterface>((set) => ({
         ),
         loading: false,
       }));
-      console.log("after ssetting delete");
-
+      
       toast.success("Product deleted successfully");
     } catch (error) {
       set({ loading: false });

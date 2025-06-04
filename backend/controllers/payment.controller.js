@@ -24,7 +24,6 @@ export const createCheckoutSession = async (req, res) => {
     const lineItems = products.map((product) => {
       const amount = Math.round(product.price * 100); // dollar => cent for stripe
       totalAmount += amount * product.quantity; // total amount in cents
-      console.log(`Total Amount: ${totalAmount}`);
 
       return {
         // return stripe friendly line-items
@@ -91,7 +90,6 @@ export const createCheckoutSession = async (req, res) => {
       // if order exceeds $200, reward user with new coupon gift
       await createNewCoupon(req.user._id);
     }
-    console.log("Created Stripe session:", session.id);
     res.status(200).json({ id: session.id, totalAmount: totalAmount / 100 });
   } catch (error) {
     console.error(

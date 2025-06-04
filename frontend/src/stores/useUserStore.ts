@@ -30,6 +30,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
     set({ loading: true });
 
     if (password !== confirmPassword) {
+      set({ loading: false });
       return toast.error("Passwords do not match");
     }
 
@@ -61,6 +62,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       set({ user: res.data.user, loading: false });
       toast.success("User logged in successfully");
     } catch (error) {
+      set({ loading: false });
       if (axios.isAxiosError(error) && error.response) {
         return toast.error(
           error.response?.data.message || "Login error occured",
@@ -77,7 +79,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       set({ user: null });
       toast.success("Logout successfully");
     } catch (error) {
-      set({ user: null });
+      set({ user: null }); // Still clear user state even if logout fails
       if (axios.isAxiosError(error) && error.response) {
         console.error("Logout error:", error.response.data?.message);
       }
@@ -91,9 +93,9 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       const res = await axiosInst.get("/auth/profile");
       set({ user: res.data, checkingAuth: false });
     } catch (error) {
-      if(axios.isAxiosError(error)) {
-        if(error.response?.status !== 401) {
-          console.error("Error checking auth:", error.response?.data?.mess);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status !== 401) {
+          console.error("Error checking auth:", error.response?.data?.message);
         }
       }
       set({ checkingAuth: false, user: null });
@@ -114,14 +116,12 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       throw error;
     }
   },
-
 }));
+
 export default useUserStore;
 
 let refreshPromise: Promise<any> | null = null;
 
-//* Axios interceptor to refresh access token
-// Updated axios interceptor in useUserStore.ts
 axiosInst.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -137,26 +137,25 @@ axiosInst.interceptors.response.use(
       console.log("Token expired, attempting refresh");
 
       try {
-        // if refresh is already in progress
+        // If refresh is already in progress, wait for it
         if (refreshPromise) {
           await refreshPromise;
-          return axios(originalRequest);
+          return axiosInst(originalRequest); // Use axiosInst instead of axios
         }
 
-        // start new refresh process
+        // Start new refresh process
         refreshPromise = useUserStore.getState().refreshToken();
         await refreshPromise;
         refreshPromise = null;
 
-        return axios(originalRequest);
+        return axiosInst(originalRequest); // Use axiosInst instead of axios
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
         refreshPromise = null;
 
-        // Only logout if we are not already on login/signup pages
+        // Only logout if we are not already on login/signup pages or checkout success
         const currentPath = window.location.pathname;
-
-        if(!['/login', '/signup'].includes(currentPath)) {
+        if (!['/login', '/signup', '/purchase-success'].includes(currentPath)) {
           useUserStore.getState().logout();
           toast.error("Session expired. Please log in again.");
         }
