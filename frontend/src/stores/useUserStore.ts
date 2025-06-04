@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { create } from "zustand";
@@ -60,7 +61,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       set({ user: res.data.user, loading: false });
       toast.success("User logged in successfully");
     } catch (error) {
-      if (axios.isAxiosError(error) && error.message) {
+      if (axios.isAxiosError(error) && error.response) {
         return toast.error(
           error.response?.data.message || "Login error occured",
         );
@@ -76,10 +77,9 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       set({ user: null });
       toast.success("Logout successfully");
     } catch (error) {
-      if (axios.isAxiosError(error) && error.message) {
-        return toast.error(
-          error.response?.data?.message || "An error occured while logging out",
-        );
+      set({ user: null });
+      if (axios.isAxiosError(error) && error.response) {
+        console.error("Logout error:", error.response.data?.message);
       }
     }
   },
@@ -89,13 +89,14 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
 
     try {
       const res = await axiosInst.get("/auth/profile");
-      set({ user: res.data.user, checkingAuth: false });
+      set({ user: res.data, checkingAuth: false });
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        set({ checkingAuth: false, user: null });
-      } else {
-        console.error("Error checking auth", error);
+      if(axios.isAxiosError(error)) {
+        if(error.response?.status !== 401) {
+          console.error("Error checking auth:", error.response?.data?.mess);
+        }
       }
+      set({ checkingAuth: false, user: null });
     }
   },
 
@@ -113,6 +114,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       throw error;
     }
   },
+
 }));
 export default useUserStore;
 
@@ -124,6 +126,7 @@ axiosInst.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
     // Check for token expiration or unauthorized error
     if (
       (error.response?.status === 401 ||
@@ -148,8 +151,16 @@ axiosInst.interceptors.response.use(
         return axios(originalRequest);
       } catch (refreshError) {
         console.error("Token refresh failed:", refreshError);
-        useUserStore.getState().logout();
-        toast.error("Session expired. Please log in again.");
+        refreshPromise = null;
+
+        // Only logout if we are not already on login/signup pages
+        const currentPath = window.location.pathname;
+
+        if(!['/login', '/signup'].includes(currentPath)) {
+          useUserStore.getState().logout();
+          toast.error("Session expired. Please log in again.");
+        }
+
         return Promise.reject(refreshError);
       }
     }
