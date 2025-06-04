@@ -16,3 +16,8 @@ export interface CategoryProps {
     imageUrl: string;
   };
 }
+
+export interface Coupon {
+  discountPercentage: number;
+  code: string;
+}

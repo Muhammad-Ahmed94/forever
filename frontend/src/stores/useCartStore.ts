@@ -3,12 +3,9 @@ import toast from "react-hot-toast";
 import { create } from "zustand";
 import axiosInst from "../lib/axios";
 
-import { Product } from "../types/Product";
+import { Coupon, Product } from "../types/Product";
 
-interface Coupon {
-  discountPercentage: number;
-  code: string;
-}
+
 interface cartInterface {
   cart: Product[];
   coupon: Coupon | null;
@@ -86,13 +83,16 @@ export const useCartStore = create<cartInterface>((set, get) => ({
       }));
       get().calculateTotals();
     } catch (error) {
-      toast.error("Could not remove product from cart");
+      if(axios.isAxiosError(error) && error.response) {
+        toast.error("Could not remove product from cart");
+      }
     }
   },
 
   clearCart: async () => {
-    set({ cart: [], coupon: null, total: 0, subtotal: 0 });
+    set({ cart: [], coupon: null, total: 0, subtotal: 0, isCouponApplied: false });
   },
+
   calculateTotals: () => {
     const { cart, coupon } = get();
     const subtotal = cart.reduce(
@@ -124,7 +124,9 @@ export const useCartStore = create<cartInterface>((set, get) => ({
       }));
       get().calculateTotals();
     } catch (error) {
-      toast.error("Could not update product quantity");
+      if(axios.isAxiosError(error) && error.response) {
+        toast.error("Could not update product quantity");
+      }
     }
   },
 
@@ -141,14 +143,17 @@ export const useCartStore = create<cartInterface>((set, get) => ({
     try {
       const res = await axiosInst.post("/coupon/validateCoupon", { code });
       set({ coupon: res.data, isCouponApplied: true });
+      get().calculateTotals();
       toast.success("Coupon applied successfully");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         toast.error(
           error.response.data.message || "Failed to apply the coupon",
         );
+      } else {
+        toast.error("Failed to apply coupon");
       }
-    }
+    } 
   },
 
   removeCoupon: () => {
