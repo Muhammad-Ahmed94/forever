@@ -109,10 +109,13 @@ export const checkoutSuccess = async (req, res) => {
       return res.status(400).json({ message: "Session ID is required" });
     }
 
+    console.log("Processing checkout success for session:", sessionId);
+
     // First check if an order with this sessionId already exists
     const existingOrder = await orderModel.findOne({
       stripeSessionId: sessionId,
     });
+    
     if (existingOrder) {
       console.log("Order already exists for this session:", existingOrder._id);
       return res.status(200).json({
@@ -122,61 +125,120 @@ export const checkoutSuccess = async (req, res) => {
       });
     }
 
+    // Retrieve session from Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId);
+    console.log("Stripe session payment status:", session.payment_status);
 
     if (session.payment_status !== "paid") {
-      res.status(400).json({
+      return res.status(400).json({
         message: "Payment not completed yet. Please proceed to pay first.",
       });
     }
 
-    if (session.payment_status === "paid") {
-      // off the coupon if used already
-      if (session.metadata.couponCode) {
-        await couponModel.findOneAndUpdate(
-          {
-            code: session.metadata.couponCode,
-            userId: session.metadata.userId,
-          },
-          {
-            isActive: false,
-          },
-        );
-      }
+    // Use a transaction to ensure atomicity
+    const mongoose = await import('mongoose');
+    const sessionObj = await mongoose.default.startSession();
+    
+    try {
+      await sessionObj.withTransaction(async () => {
+        // Double-check if order exists within the transaction
+        const orderExists = await orderModel.findOne({
+          stripeSessionId: sessionId,
+        }).session(sessionObj);
+        
+        if (orderExists) {
+          throw new Error("ORDER_ALREADY_EXISTS");
+        }
 
-      // create order record
-      const products = JSON.parse(session.metadata.products);
-      console.log("About to create order with sessionId:", sessionId);
-      const newOrder = new orderModel({
-        user: session.metadata.userId,
-        products: products.map((p) => ({
-          product: p.id,
-          quantity: p.quantity,
-          price: p.price,
-        })),
-        totalAmount: session.amount_total / 100,
-        stripeSessionId: sessionId,
+        // Deactivate coupon if used
+        if (session.metadata.couponCode) {
+          await couponModel.findOneAndUpdate(
+            {
+              code: session.metadata.couponCode,
+              userId: session.metadata.userId,
+            },
+            { isActive: false },
+            { session: sessionObj }
+          );
+        }
+
+        // Create order record
+        const products = JSON.parse(session.metadata.products);
+        console.log("Creating order with sessionId:", sessionId);
+        
+        const newOrder = new orderModel({
+          user: session.metadata.userId,
+          products: products.map((p) => ({
+            product: p.id,
+            quantity: p.quantity,
+            price: p.price,
+          })),
+          totalAmount: session.amount_total / 100,
+          stripeSessionId: sessionId,
+        });
+
+        await newOrder.save({ session: sessionObj });
+        console.log("Order created successfully:", newOrder._id);
+
+        // Set the order ID for response
+        req.newOrderId = newOrder._id;
       });
 
-      await newOrder.save();
-
-      console.log("order created successfully:", newOrder);
-
-      // New reward coupon if total amount exceed min threshhold of $200
+      // Create reward coupon if applicable (outside transaction)
       if (session.amount_total / 100 >= 200) {
-        const newCoupon = await createNewCoupon(session.metadata.userId);
-        console.log("New reward coupon created:", newCoupon);
+        try {
+          const newCoupon = await createNewCoupon(session.metadata.userId);
+          console.log("New reward coupon created:", newCoupon?.code);
+        } catch (couponError) {
+          console.error("Failed to create reward coupon:", couponError.message);
+          // Don't fail the order if coupon creation fails
+        }
       }
 
       res.status(200).json({
         success: true,
-        message:
-          "Payment successful, order created and coupon deactivated if used",
-        orderId: newOrder._id,
+        message: "Payment successful, order created and coupon deactivated if used",
+        orderId: req.newOrderId,
       });
+
+    } catch (transactionError) {
+      if (transactionError.message === "ORDER_ALREADY_EXISTS") {
+        const existingOrder = await orderModel.findOne({
+          stripeSessionId: sessionId,
+        });
+        return res.status(200).json({
+          success: true,
+          message: "Order was already processed",
+          orderId: existingOrder._id,
+        });
+      }
+      throw transactionError;
+    } finally {
+      await sessionObj.endSession();
     }
+
   } catch (error) {
-    console.error("Error processing successful checkout", error.message);
+    console.error("Error processing successful checkout:", error.message);
+    
+    // Check if it's a duplicate key error
+    if (error.code === 11000 && error.keyPattern?.stripeSessionId) {
+      console.log("Duplicate session ID detected, checking existing order");
+      try {
+        const existingOrder = await orderModel.findOne({
+          stripeSessionId: req.body.sessionId,
+        });
+        if (existingOrder) {
+          return res.status(200).json({
+            success: true,
+            message: "Order was already processed",
+            orderId: existingOrder._id,
+          });
+        }
+      } catch (findError) {
+        console.error("Error finding existing order:", findError.message);
+      }
+    }
+    
     res.status(500).json({ message: "Error processing successful checkout" });
   }
 };
@@ -187,11 +249,11 @@ async function createStripeCoupon(discount) {
       percent_off: discount,
       duration: "once",
     });
-    console.log("strie coupon:", coupon);
+    console.log("stripe coupon:", coupon);
     return coupon.id;
   } catch (error) {
     console.error("Stripe coupon creation failed", error.message);
-    return res.status(500).json({ message: "Stripe coupon creation failed." });
+    throw new Error("Stripe coupon creation failed");
   }
 }
 

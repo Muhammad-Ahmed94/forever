@@ -139,7 +139,7 @@ export const useCartStore = create<cartInterface>((set, get) => ({
 
   applyCoupon: async (code) => {
     try {
-      const res = await axiosInst.post("/validateCoupon", { code });
+      const res = await axiosInst.post("/coupon/validateCoupon", { code });
       set({ coupon: res.data, isCouponApplied: true });
       toast.success("Coupon applied successfully");
     } catch (error) {
