@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Button from "../components/Button";
+// import Button from "../components/Button";
 import Formfield from "../components/Formfield";
 import useUserStore from "../stores/useUserStore";
 
@@ -13,7 +13,7 @@ const SignUpPage = () => {
     confirmPassword: "",
   });
 
-  const { signup } = useUserStore();
+  const { signup, loading } = useUserStore();
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,14 +28,16 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="w-full h-screen shadow-2xl text-2xl relative text-center py-8 flex flex-col align-center">
-      <h2 className="font-semibold">Create account</h2>
-      <div className="border border-gray-300 flex flex-col align-center rounded py-4 w-full">
-        Enter details below
-        <div className="flex flex-col align-center mx-4 text-xl w-full">
+    <div className="w-full min-h-screen shadow-2xl text-xl relative text-center py-8 flex flex-col items-center justify-center">
+      <div className="max-w-md w-full mx-auto px-4">
+        <h2 className="font-semibold text-2xl mb-6">Create account</h2>
+        
+        <div className="border border-gray-300 flex flex-col align-center rounded py-6 px-4 bg-white">
+          <p className="text-gray-600 mb-4">Enter details below</p>
+          
           <form
             onSubmit={handleFormSubmit}
-            className="px-6 py-4 flex flex-col items-center text-lg capitalize shadow-xl"
+            className="w-full max-w-sm space-y-4 "
           >
             <Formfield
               type="text"
@@ -45,6 +47,7 @@ const SignUpPage = () => {
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
+              className="w-full"
             />
 
             <Formfield
@@ -55,6 +58,7 @@ const SignUpPage = () => {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
+              className="w-full"
             />
 
             <Formfield
@@ -65,30 +69,40 @@ const SignUpPage = () => {
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
+              className="w-full"
             />
 
             <Formfield
               type="password"
-              title="Confirm pasword"
+              title="Confirm Password"
               placeholder="**********"
               value={formData.confirmPassword}
               onChange={(e) =>
                 setFormData({ ...formData, confirmPassword: e.target.value })
               }
+              className="w-full"
             />
-            <div className="cursor-pointer">
-              <Button name="Create" />
+            
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full px-6 py-3 bg-auth-color text-white rounded cursor-pointer font-medium hover:bg-opacity-90 disabled:opacity-50"
+              >
+                {loading ? "Creating..." : "Create Account"}
+              </button>
             </div>
           </form>
-          <div className="text-[#b2b2b2] w-full">
-            <p className="flex align-center">
+          
+          <div className="text-gray-500 w-full mt-6 text-center">
+            <p className="flex items-center justify-center gap-1">
               Already have an account?
               <Link
                 to="/login"
-                className="text-[#232323] underline flex align-center"
+                className="text-auth-color underline flex items-center gap-1 hover:no-underline"
               >
                 Login here
-                <ArrowRight />
+                <ArrowRight size={16} />
               </Link>
             </p>
           </div>

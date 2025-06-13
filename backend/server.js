@@ -24,12 +24,33 @@ const __dirname = path.resolve();
 app.use(compression());
 app.use(
   cors({
-    origin: ["http://localhost:5173", process.env.CLIENT_URL],
+    origin: [
+    "http://localhost:5173", 
+    "https://localhost:4173",
+    process.env.CLIENT_URL,
+    /\.onrender\.com$/,
+    /\.netlify\.app$/,
+    // Add your actual frontend URLs
+    "https://forever-frontend-je1a.onrender.com", // Update with your actual URL
+  ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'Cookie',
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ],
+  exposedHeaders: ["Set-Cookie"],
+  optionsSuccessStatus: 200
   }),
 );
+
+// Hnalde preflight reqs
+app.options("*", cors());
+
 app.use(express.json({ limit: "3mb" }));
 app.use(cookieParser());
 
@@ -38,7 +59,9 @@ app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    service: 'Forever Backend'
+    service: 'Forever Backend',
+    environment: process.env.NODE_ENV,
+    port: PORT
   });
 });
 
@@ -57,7 +80,9 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on port http://localhost:${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
+  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
   connectDB();
 });

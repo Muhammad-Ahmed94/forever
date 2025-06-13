@@ -127,6 +127,11 @@ axiosInst.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (originalRequest.url?.includes('/auth/login') || 
+        originalRequest.url?.includes('/auth/signup')) {
+      return Promise.reject(error);
+    }
+
     // Check for token expiration or unauthorized error
     if (
       (error.response?.status === 401 ||
@@ -140,7 +145,7 @@ axiosInst.interceptors.response.use(
         // If refresh is already in progress, wait for it
         if (refreshPromise) {
           await refreshPromise;
-          return axiosInst(originalRequest); // Use axiosInst instead of axios
+          return axiosInst(originalRequest);
         }
 
         // Start new refresh process
