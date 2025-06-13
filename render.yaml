@@ -1,12 +1,28 @@
 services:
+  # Backend Service
   - type: web
     name: forever-backend
     env: node
     plan: free
+    region: oregon
     buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+
+  # Frontend Service  
+  - type: web
+    name: forever-frontend
+    env: static
+    plan: free
+    region: oregon
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
