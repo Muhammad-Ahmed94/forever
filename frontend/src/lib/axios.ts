@@ -29,4 +29,19 @@ axiosInst.interceptors.request.use(
   }
 );
 
+// Enhanced response interceptor for better error handling
+axiosInst.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+    
+    return Promise.reject(error);
+  }
+);
+
 export default axiosInst;
