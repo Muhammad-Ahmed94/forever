@@ -5,7 +5,8 @@ import orderModel from "../model/order.model.js";
 export const createCheckoutSession = async (req, res) => {
   try {
     const { products, couponCode } = req.body;
-    console.log(`Coupon Code: ${couponCode}`);
+    console.log(`Creating checkout session - Coupon Code: ${couponCode}`);
+    console.log(`Products:`, products);
 
     // check if we get products array from frontend checkout session req
     if (!Array.isArray(products) || products.length === 0) {
@@ -57,6 +58,19 @@ export const createCheckoutSession = async (req, res) => {
       }
     }
 
+    // Fixed: Dynamic URL based on environment
+    const getClientUrl = () => {
+      if (process.env.NODE_ENV === "production") {
+        return process.env.CLIENT_URL || "https://forever-frontend-je1a.onrender.com";
+      } else {
+        // For development, use localhost
+        return "http://localhost:5173";
+      }
+    };
+
+    const clientUrl = getClientUrl();
+    console.log(`Using client URL: ${clientUrl}`);
+
     /* 
     1- create stripe payment session
     2- if coupon exists, then apply the coupon discounts
@@ -66,8 +80,8 @@ export const createCheckoutSession = async (req, res) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/purchase-cancel/`,
+      success_url: `${clientUrl}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${clientUrl}/purchase-cancel/`,
       discounts: coupon
         ? [{ coupon: await createStripeCoupon(coupon.discount) }]
         : [],
@@ -86,6 +100,9 @@ export const createCheckoutSession = async (req, res) => {
       expand: ["payment_intent"],
     });
 
+    console.log(`Checkout session created: ${session.id}`);
+    console.log(`Success URL: ${session.success_url}`);
+
     if (totalAmount >= 20000) {
       // if order exceeds $200, reward user with new coupon gift
       await createNewCoupon(req.user._id);
@@ -103,7 +120,12 @@ export const createCheckoutSession = async (req, res) => {
 export const checkoutSuccess = async (req, res) => {
   try {
     const { sessionId } = req.body;
+    console.log("=== CHECKOUT SUCCESS START ===");
+    console.log("Received sessionId:", sessionId);
+    console.log("Request body:", req.body);
+    
     if (!sessionId) {
+      console.log("ERROR: No session ID provided");
       return res.status(400).json({ message: "Session ID is required" });
     }
 
@@ -124,10 +146,13 @@ export const checkoutSuccess = async (req, res) => {
     }
 
     // Retrieve session from Stripe
+    console.log("Retrieving session from Stripe...");
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     console.log("Stripe session payment status:", session.payment_status);
+    console.log("Stripe session metadata:", session.metadata);
 
     if (session.payment_status !== "paid") {
+      console.log("ERROR: Payment not completed, status:", session.payment_status);
       return res.status(400).json({
         message: "Payment not completed yet. Please proceed to pay first.",
       });
@@ -138,6 +163,8 @@ export const checkoutSuccess = async (req, res) => {
     const sessionObj = await mongoose.default.startSession();
     
     try {
+      let newOrderId = null;
+      
       await sessionObj.withTransaction(async () => {
         // Double-check if order exists within the transaction
         const orderExists = await orderModel.findOne({
@@ -150,6 +177,7 @@ export const checkoutSuccess = async (req, res) => {
 
         // Deactivate coupon if used
         if (session.metadata.couponCode) {
+          console.log("Deactivating coupon:", session.metadata.couponCode);
           await couponModel.findOneAndUpdate(
             {
               code: session.metadata.couponCode,
@@ -162,7 +190,7 @@ export const checkoutSuccess = async (req, res) => {
 
         // Create order record
         const products = JSON.parse(session.metadata.products);
-        console.log("Creating order with sessionId:", sessionId);
+        console.log("Creating order with products:", products);
         
         const newOrder = new orderModel({
           user: session.metadata.userId,
@@ -175,11 +203,9 @@ export const checkoutSuccess = async (req, res) => {
           stripeSessionId: sessionId,
         });
 
-        await newOrder.save({ session: sessionObj });
-        console.log("Order created successfully:", newOrder._id);
-
-        // Set the order ID for response
-        req.newOrderId = newOrder._id;
+        const savedOrder = await newOrder.save({ session: sessionObj });
+        newOrderId = savedOrder._id;
+        console.log("Order created successfully:", newOrderId);
       });
 
       // Create reward coupon if applicable (outside transaction)
@@ -193,10 +219,11 @@ export const checkoutSuccess = async (req, res) => {
         }
       }
 
+      console.log("=== CHECKOUT SUCCESS COMPLETED ===");
       res.status(200).json({
         success: true,
         message: "Payment successful, order created and coupon deactivated if used",
-        orderId: req.newOrderId,
+        orderId: newOrderId,
       });
 
     } catch (transactionError) {
@@ -204,6 +231,7 @@ export const checkoutSuccess = async (req, res) => {
         const existingOrder = await orderModel.findOne({
           stripeSessionId: sessionId,
         });
+        console.log("Transaction detected existing order:", existingOrder._id);
         return res.status(200).json({
           success: true,
           message: "Order was already processed",
@@ -216,7 +244,8 @@ export const checkoutSuccess = async (req, res) => {
     }
 
   } catch (error) {
-    console.error("Error processing successful checkout:", error.message);
+    console.error("=== CHECKOUT SUCCESS ERROR ===");
+    console.error("Error processing successful checkout:", error);
     
     // Check if it's a duplicate key error
     if (error.code === 11000 && error.keyPattern?.stripeSessionId) {
