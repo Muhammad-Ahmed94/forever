@@ -1,15 +1,10 @@
 import { Minus, Plus, Trash } from "lucide-react";
-import { useEffect } from "react";
 import { useCartStore } from "../stores/useCartStore";
 
 import { Product } from "../types/Product";
 
 const CartItem = ({ item }: { item: Product }) => {
   const { updateQuantity, removeFromCart } = useCartStore();
-
-  useEffect(() => {
-    console.log(item);
-  }, []);
 
   return (
     <div className="rounded-lg border p-4 shadow-sm border-gray-700 md:p-6">

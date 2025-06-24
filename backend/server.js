@@ -65,16 +65,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// middleware req debugger
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`, {
-    body: req.body,
-    cookies: Object.keys(req.cookies),
-    origin: req.get('origin')
-  });
-  next();
-});
-
 //* Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);

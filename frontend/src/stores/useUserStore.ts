@@ -42,7 +42,6 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       });
       set({ user: res.data.user, loading: false });
       toast.success("Account created successfully");
-      console.log(res.data);
     } catch (error) {
       set({ loading: false });
 

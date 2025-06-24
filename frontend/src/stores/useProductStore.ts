@@ -52,7 +52,6 @@ export const useProductStore = create<productStoreInterface>((set) => ({
     try {
       const res = await axiosInst.get("/products");
       set({ products: res.data.products, loading: false });
-      console.log(res.data);
       toast.success("Retrieving all products");
     } catch (error) {
       set({ loading: false });

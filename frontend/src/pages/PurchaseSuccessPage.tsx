@@ -15,14 +15,12 @@ const PurchaseSuccessPage = () => {
 
   useEffect(() => {
     const handlePaymentSuccess = async (sessionId: string) => {
-      console.log("Processing payment for session:", sessionId);
 
       try {
         const response = await axiosInst.post("/payment/checkout-success", {
           sessionId,
         });
 
-        console.log("Payment success response:", response.data);
         setOrderId(response.data.orderId);
         clearCart();
         setIsProcessing(false);
@@ -35,7 +33,6 @@ const PurchaseSuccessPage = () => {
           error.response?.data?.message === "Order was already processed" &&
           error.response?.data?.orderId
         ) {
-          console.log("Order was already processed, showing success");
           setOrderId(error.response.data.orderId);
           clearCart();
           setIsProcessing(false);

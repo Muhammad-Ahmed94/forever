@@ -14,9 +14,7 @@ import useUserStore from "./stores/useUserStore";
 
 const App = () => {
   const { user, checkAuth, checkingAuth } = useUserStore();
-  if (user) {
-    console.log(user?.role, user?.name);
-  }
+  
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);

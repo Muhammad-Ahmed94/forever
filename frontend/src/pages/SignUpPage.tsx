@@ -23,8 +23,6 @@ const SignUpPage = () => {
       formData.password,
       formData.confirmPassword,
     );
-
-    console.log("signup complete");
   };
 
   return (

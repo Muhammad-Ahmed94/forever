@@ -6,7 +6,6 @@ export const createCheckoutSession = async (req, res) => {
   try {
     const { products, couponCode } = req.body;
     console.log(`Creating checkout session - Coupon Code: ${couponCode}`);
-    console.log(`Products:`, products);
 
     // check if we get products array from frontend checkout session req
     if (!Array.isArray(products) || products.length === 0) {
@@ -69,8 +68,6 @@ export const createCheckoutSession = async (req, res) => {
     };
 
     const clientUrl = getClientUrl();
-    console.log(`Using client URL: ${clientUrl}`);
-
     /* 
     1- create stripe payment session
     2- if coupon exists, then apply the coupon discounts
@@ -120,16 +117,11 @@ export const createCheckoutSession = async (req, res) => {
 export const checkoutSuccess = async (req, res) => {
   try {
     const { sessionId } = req.body;
-    console.log("=== CHECKOUT SUCCESS START ===");
-    console.log("Received sessionId:", sessionId);
-    console.log("Request body:", req.body);
     
     if (!sessionId) {
       console.log("ERROR: No session ID provided");
       return res.status(400).json({ message: "Session ID is required" });
     }
-
-    console.log("Processing checkout success for session:", sessionId);
 
     // First check if an order with this sessionId already exists
     const existingOrder = await orderModel.findOne({
@@ -190,7 +182,6 @@ export const checkoutSuccess = async (req, res) => {
 
         // Create order record
         const products = JSON.parse(session.metadata.products);
-        console.log("Creating order with products:", products);
         
         const newOrder = new orderModel({
           user: session.metadata.userId,
@@ -212,7 +203,6 @@ export const checkoutSuccess = async (req, res) => {
       if (session.amount_total / 100 >= 200) {
         try {
           const newCoupon = await createNewCoupon(session.metadata.userId);
-          console.log("New reward coupon created:", newCoupon?.code);
         } catch (couponError) {
           console.error("Failed to create reward coupon:", couponError.message);
           // Don't fail the order if coupon creation fails
@@ -231,7 +221,6 @@ export const checkoutSuccess = async (req, res) => {
         const existingOrder = await orderModel.findOne({
           stripeSessionId: sessionId,
         });
-        console.log("Transaction detected existing order:", existingOrder._id);
         return res.status(200).json({
           success: true,
           message: "Order was already processed",
@@ -276,7 +265,6 @@ async function createStripeCoupon(discount) {
       percent_off: discount,
       duration: "once",
     });
-    console.log("stripe coupon:", coupon);
     return coupon.id;
   } catch (error) {
     console.error("Stripe coupon creation failed", error.message);
@@ -297,7 +285,6 @@ async function createNewCoupon(userId) {
       isActive: true,
     });
     const savedCoupon = await newCoupon.save();
-    console.log(`Reward coupon generated for user:${userId}`, savedCoupon);
 
     return savedCoupon;
   } catch (error) {

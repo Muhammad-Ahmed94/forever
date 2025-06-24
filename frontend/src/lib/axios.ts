@@ -11,43 +11,4 @@ const axiosInst = axios.create({
   }
 });
 
-// Enhanced request interceptor
-axiosInst.interceptors.request.use(
-  (config) => {
-    console.log(`Making ${config.method?.toUpperCase()} request to:`, config.url);
-    
-    // Add timestamp to prevent caching issues
-    if (config.method === 'get') {
-      config.params = {
-        ...config.params,
-        _t: Date.now()
-      };
-    }
-    return config;
-  },
-  (error) => {
-    console.error('Request interceptor error:', error);
-    return Promise.reject(error);
-  }
-);
-
-// Enhanced response interceptor for better error handling
-axiosInst.interceptors.response.use(
-  (response) => {
-    console.log(`✅ ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status}`);
-    return response;
-  },
-  async (error) => {
-    console.error('❌ API Error:', {
-      url: error.config?.url,
-      method: error.config?.method,
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
-    
-    return Promise.reject(error);
-  }
-);
-
 export default axiosInst;
