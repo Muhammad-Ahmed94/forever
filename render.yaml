@@ -23,6 +23,15 @@ services:
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
     routes:
+      # Explicitly rewrite /purchase-success to index.html
+      - type: rewrite
+        source: /purchase-success
+        destination: /index.html
+      # purchase cancel
+      - type: rewrite
+        source: /purchase-cancel
+        destination: /index.html
+      # Catch-all for other client-side routes
       - type: rewrite
         source: /*
         destination: /index.html

@@ -20,7 +20,6 @@ const CategoryItem: React.FC<CategoryProps> = ({ category }) => {
         <p className="text-sm text-black/50">Explore {category.name}</p>
       </div>
 
-      {/* Optional: dark overlay for better text contrast */}
       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition duration-300" />
     </Link>
   );

@@ -31,7 +31,7 @@ app.use(
     /\.onrender\.com$/,
     /\.netlify\.app$/,
     // Add your actual frontend URLs
-    "https://forever-frontend-je1a.onrender.com", // Update with your actual URL
+    "https://forever-frontend-je1a.onrender.com", // render frontend URL
   ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
@@ -48,13 +48,13 @@ app.use(
   }),
 );
 
-// Hnalde preflight reqs
+// preflight reqs
 app.options("*", cors());
 
 app.use(express.json({ limit: "3mb" }));
 app.use(cookieParser());
 
-// Health check endpoint for render
+// Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 

@@ -57,7 +57,7 @@ export const createCheckoutSession = async (req, res) => {
       }
     }
 
-    // Fixed: Dynamic URL based on environment
+    // environment URL
     const getClientUrl = () => {
       if (process.env.NODE_ENV === "production") {
         return process.env.CLIENT_URL || "https://forever-frontend-je1a.onrender.com";
@@ -236,7 +236,7 @@ export const checkoutSuccess = async (req, res) => {
     console.error("=== CHECKOUT SUCCESS ERROR ===");
     console.error("Error processing successful checkout:", error);
     
-    // Check if it's a duplicate key error
+    // duplicate key error
     if (error.code === 11000 && error.keyPattern?.stripeSessionId) {
       console.log("Duplicate session ID detected, checking existing order");
       try {
@@ -272,7 +272,7 @@ async function createStripeCoupon(discount) {
   }
 }
 
-// Create reward coupon -- fixed function
+// Create reward coupon function
 async function createNewCoupon(userId) {
   try {
     await couponModel.findOneAndDelete({ userId });

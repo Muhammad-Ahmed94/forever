@@ -78,7 +78,7 @@ const useUserStore = create<userStoreInterface>((set, get) => ({
       set({ user: null });
       toast.success("Logout successfully");
     } catch (error) {
-      set({ user: null }); // Still clear user state even if logout fails
+      set({ user: null });
       if (axios.isAxiosError(error) && error.response) {
         console.error("Logout error:", error.response.data?.message);
       }

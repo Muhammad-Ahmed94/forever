@@ -4,7 +4,6 @@ import { useProductStore } from "../stores/useProductStore";
 import Formfield from "./Formfield";
 
 import { Product } from "../types/Product";
-// Add at the top of your file
 
 const CreateProductForm = () => {
   const [newProduct, setNewProduct] = useState<Product>({
