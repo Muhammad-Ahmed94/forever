@@ -5,10 +5,24 @@ const axiosInst = axios.create({
     ? "https://forever-backend-1i7v.onrender.com/api"
     : "http://localhost:5000/api",
   withCredentials: true,
-  timeout: 30000,
+  timeout: 60000,
   headers: {
     "Content-Type": "application/json"
   }
 });
+
+// Add request interceptor to log requests in production
+axiosInst.interceptors.request.use(
+  (config) => {
+    if (import.meta.env.PROD) {
+      console.log(`Making request to: ${config.baseURL}${config.url}`);
+    }
+    return config;
+  },
+  (error) => {
+    console.error("Request error:", error);
+    return Promise.reject(error);
+  }
+);
 
 export default axiosInst;

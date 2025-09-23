@@ -78,7 +78,7 @@ export const createCheckoutSession = async (req, res) => {
       line_items: lineItems,
       mode: "payment",
       success_url: `${clientUrl}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${clientUrl}/purchase-cancel/`,
+      cancel_url: `${clientUrl}/purchase-cancel`,
       discounts: coupon
         ? [{ coupon: await createStripeCoupon(coupon.discount) }]
         : [],

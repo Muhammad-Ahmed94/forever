@@ -27,11 +27,11 @@ app.use(
     origin: [
     "http://localhost:5173", 
     "https://localhost:4173",
+    "https://forever-frontend-je1a.onrender.com", // render frontend URL
     process.env.CLIENT_URL,
     /\.onrender\.com$/,
     /\.netlify\.app$/,
     // Add your actual frontend URLs
-    "https://forever-frontend-je1a.onrender.com", // render frontend URL
   ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],

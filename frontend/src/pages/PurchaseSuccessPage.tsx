@@ -15,18 +15,20 @@ const PurchaseSuccessPage = () => {
 
   useEffect(() => {
     const handlePaymentSuccess = async (sessionId: string) => {
-
+      console.log("Processing payment success for session:", sessionId);
       try {
         const response = await axiosInst.post("/payment/checkout-success", {
           sessionId,
         });
 
+        console.log("Payment success response:", response.data);
         setOrderId(response.data.orderId);
         clearCart();
         setIsProcessing(false);
         toast.success("Payment processed successfully!");
       } catch (error: any) {
         console.error("Payment processing error:", error);
+        console.error("Error response:", error.response?.data);
 
         // handle order was already processed as success
         if (
@@ -49,9 +51,12 @@ const PurchaseSuccessPage = () => {
     };
 
     // Get session ID from URL and process payment
-    const urlSessionId = new URLSearchParams(window.location.search).get(
-      "session_id",
-    );
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlSessionId = urlParams.get("session_id");
+
+    console.log("URL params:", window.location.search);
+    console.log("Session ID from URL:", urlSessionId);
+
     if (urlSessionId) {
       handlePaymentSuccess(urlSessionId);
     } else {
