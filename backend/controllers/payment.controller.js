@@ -60,7 +60,7 @@ export const createCheckoutSession = async (req, res) => {
     // environment URL
     const getClientUrl = () => {
       if (process.env.NODE_ENV === "production") {
-        return process.env.CLIENT_URL || "https://forever-frontend-je1a.onrender.com";
+        return process.env.CLIENT_URL || "https://forever-frontend-je1a.onrender.com/";
       } else {
         // For development, use localhost
         return "http://localhost:5173";

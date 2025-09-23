@@ -59,8 +59,8 @@ const App = () => {
             path="/cart" 
             element={user ? <CartPage /> : <Navigate to="/login" />} 
           />
-          <Route path="/purchase-success" element={<PurchaseSuccessPage />} />
-          <Route path="/purchase-cancel" element={<PurchaseCancelPage />} />
+          <Route path="/purchase-success/*" element={<PurchaseSuccessPage />} />
+          <Route path="/purchase-cancel/*" element={<PurchaseCancelPage />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
