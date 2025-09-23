@@ -22,18 +22,16 @@ const setCookies = (res, accessToken, refreshToken) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    sameSite: isProduction ? "none" : "strict",
+    sameSite: isProduction ? "none" : "lax",
     secure: isProduction,
-    domain: isProduction ? undefined : undefined, // Let browser handle domain
     path: "/",
     maxAge: 15 * 60 * 1000, // 15 minutes
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    sameSite: isProduction ? "none" : "strict",
+    sameSite: isProduction ? "none" : "lax",
     secure: isProduction,
-    domain: isProduction ? undefined : undefined, // Let browser handle domain
     path: "/",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
@@ -145,11 +143,14 @@ export const refreshAccessToken = async (req, res) => {
       { expiresIn: "15m" }, // Updated to match new duration
     );
 
+  const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       maxAge: 15 * 60 * 1000, // 15 minutes
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: isProduction? "none" : "strict",
+      path:"/",
+      secure: isProduction,
     });
     res.json({ message: "access token refresh successfully" });
   } catch (error) {
