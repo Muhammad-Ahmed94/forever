@@ -138,10 +138,7 @@ export const checkoutSuccess = async (req, res) => {
     }
 
     // Retrieve session from Stripe
-    console.log("Retrieving session from Stripe...");
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    console.log("Stripe session payment status:", session.payment_status);
-    console.log("Stripe session metadata:", session.metadata);
 
     if (session.payment_status !== "paid") {
       console.log("ERROR: Payment not completed, status:", session.payment_status);
