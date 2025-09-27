@@ -2,7 +2,9 @@
 
 A full-stack MERN e-commerce application with user authentication, admin panel, shopping cart, and payment processing.
 
-![▶ Watch Demo Video on YouTube]([https://youtu.be/your_video_id](https://youtu.be/sfgdCth_n3I))
+CLICK ON IMAGE TO PLAY DEMO
+[![foreve-image](https://github.com/user-attachments/assets/347137fa-f29c-4a14-97e9-9653d4131dda)](https://www.youtube.com/watch?v=sfgdCth_n3I)
+
 
 
 ## Features
